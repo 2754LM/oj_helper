@@ -3,6 +3,8 @@ import 'package:oj_helper/utils/contest_utils.dart' show ContestUtils;
 import 'package:oj_helper/models/contest.dart' show Contest;
 import 'package:dio/dio.dart';
 import 'package:oj_helper/UI/widgets/dialog_checkbox.dart' show DialogCheckbox;
+import 'package:oj_helper/provider.dart';
+import 'package:provider/provider.dart';
 
 class RecentContestPage extends StatefulWidget {
   @override
@@ -17,17 +19,6 @@ class _RecentContestPageState extends State<RecentContestPage>
   Dio dio = Dio();
   // 查询天数，默认7天
   int day = 7;
-  // 近期比赛
-  List<Contest> contests = [];
-  //平台选择列表
-  Map<String, bool> selectedPlatforms = {
-    'Codeforces': true,
-    'AtCoder': true,
-    'Luogu': true,
-    '蓝桥云课': true,
-    '力扣': true,
-    '牛客': true,
-  };
 
   // 加载状态
   bool isLoading = false;
@@ -37,7 +28,11 @@ class _RecentContestPageState extends State<RecentContestPage>
     setState(() {
       isLoading = true;
     });
-    contests = await ContestUtils.getRecentContests();
+    // 获取 Provider 实例
+    ContestProvider contestProvider =
+        Provider.of<ContestProvider>(context, listen: false);
+    List<Contest> newContests = await ContestUtils.getRecentContests();
+    contestProvider.setContests(newContests); // 更新比赛列表
     setState(() {
       isLoading = false;
     });
@@ -50,7 +45,8 @@ class _RecentContestPageState extends State<RecentContestPage>
       appBar: AppBar(
         title: const Text('近期比赛'),
         actions: [
-          IconButton(
+          TextButton.icon(
+            label: Text("筛选平台"),
             icon: const Icon(Icons.filter_alt),
             onPressed: _showPlatformSelection, // 打开筛选弹窗
           ),
@@ -62,7 +58,7 @@ class _RecentContestPageState extends State<RecentContestPage>
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : _buildBody(contests),
+              : _buildBody(), // 使用 _buildBody 方法
           Align(
             alignment: Alignment.bottomRight, // 右下角
             child: Padding(
@@ -86,55 +82,67 @@ class _RecentContestPageState extends State<RecentContestPage>
           return SimpleDialog(title: Text('筛选平台'), children: [
             DialogCheckbox(
               title: 'Codeforces',
-              value: selectedPlatforms['Codeforces'],
+              value: Provider.of<ContestProvider>(context)
+                  .selectedPlatforms['Codeforces'],
               onChanged: (value) {
                 setState(() {
-                  selectedPlatforms['Codeforces'] = value!;
+                  Provider.of<ContestProvider>(context, listen: false)
+                      .updatePlatformSelection('Codeforces', value!);
                 });
               },
             ),
             DialogCheckbox(
               title: 'AtCoder',
-              value: selectedPlatforms['AtCoder'],
+              value: Provider.of<ContestProvider>(context)
+                  .selectedPlatforms['AtCoder'],
               onChanged: (value) {
                 setState(() {
-                  selectedPlatforms['AtCoder'] = value!;
+                  Provider.of<ContestProvider>(context, listen: false)
+                      .updatePlatformSelection('AtCoder', value!);
                 });
               },
             ),
             DialogCheckbox(
               title: 'Luogu',
-              value: selectedPlatforms['Luogu'],
+              value: Provider.of<ContestProvider>(context)
+                  .selectedPlatforms['Luogu'],
               onChanged: (value) {
                 setState(() {
-                  selectedPlatforms['Luogu'] = value!;
+                  Provider.of<ContestProvider>(context, listen: false)
+                      .updatePlatformSelection('Luogu', value!);
                 });
               },
             ),
             DialogCheckbox(
               title: '蓝桥云课',
-              value: selectedPlatforms['蓝桥云课'],
+              value: Provider.of<ContestProvider>(context)
+                  .selectedPlatforms['蓝桥云课'],
               onChanged: (value) {
                 setState(() {
-                  selectedPlatforms['蓝桥云课'] = value!;
+                  Provider.of<ContestProvider>(context, listen: false)
+                      .updatePlatformSelection('蓝桥云课', value!);
                 });
               },
             ),
             DialogCheckbox(
               title: '力扣',
-              value: selectedPlatforms['力扣'],
+              value:
+                  Provider.of<ContestProvider>(context).selectedPlatforms['力扣'],
               onChanged: (value) {
                 setState(() {
-                  selectedPlatforms['力扣'] = value!;
+                  Provider.of<ContestProvider>(context, listen: false)
+                      .updatePlatformSelection('力扣', value!);
                 });
               },
             ),
             DialogCheckbox(
               title: '牛客',
-              value: selectedPlatforms['牛客'],
+              value:
+                  Provider.of<ContestProvider>(context).selectedPlatforms['牛客'],
               onChanged: (value) {
                 setState(() {
-                  selectedPlatforms['牛客'] = value!;
+                  Provider.of<ContestProvider>(context, listen: false)
+                      .updatePlatformSelection('牛客', value!);
                 });
               },
             ),
@@ -149,30 +157,36 @@ class _RecentContestPageState extends State<RecentContestPage>
   }
 
   // 构建比赛列表
-  Widget _buildBody(List<Contest> contests) {
-    return ListView.separated(
-      itemCount: contests.length,
-      itemBuilder: (BuildContext context, int index) {
-        if (selectedPlatforms[contests[index].platform] == true) {
-          return ListTile(
-            title: Text(contests[index].name),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('开始时间：${contests[index].startTime}'),
-                Text('结束时间：${contests[index].endTime}'),
-                Text('比赛时长：${contests[index].duration}'),
-                Text('比赛平台：${contests[index].platform}'),
-              ],
-            ),
-          );
-        } else {
-          return Container();
-        }
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return Divider(
-          height: 1,
+  Widget _buildBody() {
+    return Consumer<ContestProvider>(
+      builder: (context, contestProvider, child) {
+        return ListView.separated(
+          itemCount: contestProvider.contests.length,
+          itemBuilder: (BuildContext context, int index) {
+            if (contestProvider.selectedPlatforms[
+                    contestProvider.contests[index].platform] ==
+                true) {
+              return ListTile(
+                title: Text(contestProvider.contests[index].name),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('开始时间：${contestProvider.contests[index].startTime}'),
+                    Text('结束时间：${contestProvider.contests[index].endTime}'),
+                    Text('比赛时长：${contestProvider.contests[index].duration}'),
+                    Text('比赛平台：${contestProvider.contests[index].platform}'),
+                  ],
+                ),
+              );
+            } else {
+              return Container();
+            }
+          },
+          separatorBuilder: (BuildContext context, int index) {
+            return Divider(
+              height: 1,
+            );
+          },
         );
       },
     );

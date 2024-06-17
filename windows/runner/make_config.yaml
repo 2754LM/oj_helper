@@ -1,0 +1,9 @@
+app_id: f847d302-628f-4209-84ca-982093d45d98
+publisher: kano07
+publisher_url: https://github.com/2754LM/oj_helper
+display_name: oj_helper
+create_desktop_icon: true
+install_dir_name: oj_helper
+target_directory: build/windows/x64/runner/Release
+locales:
+  - zh

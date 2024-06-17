@@ -12,6 +12,8 @@ dependencies:
   intl: ^0.17.0
   html: ^0.15.4
   webdriver: ^3.0.3
+  provider: ^6.0.0
+  flutter_distributor: ^0.4.0
 
 dev_dependencies:
   flutter_test:

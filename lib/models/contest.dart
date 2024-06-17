@@ -6,6 +6,8 @@ class Contest {
   final String endTime;
   final String duration;
   final String platform;
+  final String link;
+  final String monthAndDay;
 
   Contest({
     required this.name,
@@ -13,6 +15,8 @@ class Contest {
     required this.duration,
     this.endTime = '',
     required this.platform,
+    this.link = '',
+    this.monthAndDay = '',
   });
 
   static Contest fromJson(
