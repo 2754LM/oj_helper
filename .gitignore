@@ -31,7 +31,6 @@ migrate_working_dir/
 .pub/
 /build/
 .test/
-
 # Symbolication related
 app.*.symbols
 
