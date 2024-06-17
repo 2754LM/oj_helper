@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:oj_helper/utils/contest_utils.dart' show ContestUtils;
-import 'package:oj_helper/models/contest.dart' show Contest;
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:oj_helper/UI/widgets/dialog_checkbox.dart' show DialogCheckbox;
+import 'package:oj_helper/models/contest.dart' show Contest;
 import 'package:oj_helper/provider.dart';
+import 'package:oj_helper/utils/contest_utils.dart' show ContestUtils;
 import 'package:provider/provider.dart';
 
 class RecentContestPage extends StatefulWidget {

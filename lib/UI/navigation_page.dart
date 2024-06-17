@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'recent_contest_page.dart';
+
 import 'rating_page.dart';
+import 'recent_contest_page.dart';
 import 'solved_num_page.dart';
 
 class NavigationPage extends StatefulWidget {
