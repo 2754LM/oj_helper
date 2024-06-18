@@ -33,9 +33,11 @@ class _RecentContestPageState extends State<RecentContestPage>
         Provider.of<ContestProvider>(context, listen: false);
     List<Contest> newContests = await ContestUtils.getRecentContests();
     contestProvider.setContests(newContests); // 更新比赛列表
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -54,11 +56,11 @@ class _RecentContestPageState extends State<RecentContestPage>
       ),
       body: Stack(
         children: [
-          isLoading
+          isLoading // 显示加载动画
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : _buildBody(), // 使用 _buildBody 方法
+              : _buildBody(),
           Align(
             alignment: Alignment.bottomRight, // 右下角
             child: Padding(

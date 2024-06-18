@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/contest.dart' show Contest;
 import 'package:html/parser.dart' show parse;
 
-class RecentContest {
+class RecentContestServices {
   final _leetcodeUrl = "https://leetcode.cn/graphql";
   final _atcoderUrl = "https://atcoder.jp/contests/";
   final _codeforcesUrl =
@@ -12,7 +12,7 @@ class RecentContest {
       "https://www.luogu.com.cn/contest/list?page=1&_contentOnly=1";
   final lanqiaoUrl =
       "https://www.lanqiao.cn/api/v2/contests/?sort=opentime&paginate=0&status=not_finished&game_type_code=2";
-  Dio dio = Dio();
+  final Dio dio = Dio();
   final int _nowSconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   int _queryEndSeconds = 7 * 24 * 60 * 60; //最晚时间
 
@@ -112,18 +112,21 @@ class RecentContest {
         //  (时长:2小时)
         final time =
             contestList[i].getElementsByClassName("match-time-icon")[0].text;
-        //转换为 Unix 时间戳
+        // 查找所有匹配的时间，格式如2024-06-23 21:00
+        final RegExp timeRegExp = RegExp(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}');
+        final matches = timeRegExp.allMatches(time);
+        final startTimeStr = matches.elementAt(0).group(0)!;
+        final endTimeStr = matches.elementAt(1).group(0)!;
+        //转换成unix时间戳
         final startTime =
-            DateTime.parse(time.substring(9, 25)).millisecondsSinceEpoch ~/
-                1000;
+            DateTime.parse(startTimeStr).millisecondsSinceEpoch ~/ 1000;
         final endTime =
-            DateTime.parse(time.substring(33, 49)).millisecondsSinceEpoch ~/
-                1000;
+            DateTime.parse(endTimeStr).millisecondsSinceEpoch ~/ 1000;
         final duration = endTime - startTime;
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
         if (_isIntime(startTime: startTime, duration: duration) == 2) break;
         //添加元素
-        contests.add(Contest.fromJson(title, startTime, duration, '牛客'));
+        contests.add(Contest.fromJson(title, 0, 0, '牛客'));
       }
       return contests;
     } else {
@@ -227,8 +230,8 @@ class RecentContest {
 }
 
 void main() async {
-  final recentContest = RecentContest();
-  final atc = await recentContest.getLanqiaoContests();
+  final recentContest = RecentContestServices();
+  final atc = await recentContest.getNowcoderContests();
   for (var contest in atc) {
     print('${contest.name} ${contest.startTime} ${contest.duration}');
   }

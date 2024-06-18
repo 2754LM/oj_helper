@@ -14,7 +14,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (context) => ContestProvider()), // 初始化 ContestProvider
+            create: (context) => ContestProvider()
+              ..loadPlatformSelection()), // 初始化 ContestProvider
         ChangeNotifierProvider(
             create: (context) => RatingProvider()), // 初始化 RatingProvider
         ChangeNotifierProvider(

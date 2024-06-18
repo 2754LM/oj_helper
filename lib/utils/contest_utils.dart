@@ -1,9 +1,9 @@
-import 'package:oj_helper/services/recent_contest.dart';
+import 'package:oj_helper/services/recent_contest_services.dart';
 import 'package:oj_helper/models/contest.dart' show Contest;
 
 class ContestUtils {
   static Future<List<Contest>> getRecentContests({int day = 7}) async {
-    RecentContest rC = RecentContest();
+    RecentContestServices rC = RecentContestServices();
     rC.setDay(day);
     List<Contest> recentContestsList = [];
     //获取最近的比赛

@@ -37,6 +37,13 @@ class _NavigationPageState extends State<NavigationPage> {
           BottomNavigationBarItem(icon: Icon(Icons.trending_up), label: '分数'),
           BottomNavigationBarItem(icon: Icon(Icons.done), label: '题量'),
         ],
+        selectedIconTheme: IconThemeData(
+          color: Colors.blue,
+          size: 30,
+        ),
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: true,
+        showUnselectedLabels: false,
         currentIndex: _selectedIndex,
         // 点击事件
         onTap: (index) {

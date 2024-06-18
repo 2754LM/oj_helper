@@ -14,6 +14,7 @@ dependencies:
   webdriver: ^3.0.3
   provider: ^6.0.0
   flutter_distributor: ^0.4.0
+  shared_preferences: ^2.0.11
 
 dev_dependencies:
   flutter_test:
