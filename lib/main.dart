@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:oj_helper/provider.dart';
-import 'UI/navigation_page.dart';
-import 'UI/recent_contest_page.dart';
-import 'UI/rating_page.dart';
-import 'UI/solved_num_page.dart';
+import 'ui/navigation_page.dart';
+import 'ui/recent_contest_page.dart';
+import 'ui/rating_page.dart';
+import 'ui/solved_num_page.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
@@ -25,7 +25,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.light()
+              .copyWith(primary: const Color.fromARGB(255, 255, 255, 255)),
         ),
         // 注册路由
         routes: {

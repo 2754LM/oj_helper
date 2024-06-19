@@ -206,6 +206,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.4"
+  flutter_draggable_gridview:
+    dependency: "direct main"
+    description:
+      name: flutter_draggable_gridview
+      sha256: "558747591fc3fccb1ecf97f8f540a160b1712b4ab12d57f3ce961d1190487164"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.12"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -222,6 +230,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  flutter_staggered_grid_view:
+    dependency: "direct main"
+    description:
+      name: flutter_staggered_grid_view
+      sha256: f0b6d8c0fa7b4b444985cdde68492c0138a4fb6fc57a641b24cb234b7ee0f5c4
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:oj_helper/UI/widgets/dialog_checkbox.dart' show DialogCheckbox;
+import 'package:oj_helper/ui/widgets/dialog_checkbox.dart' show DialogCheckbox;
 import 'package:oj_helper/models/contest.dart' show Contest;
 import 'package:oj_helper/provider.dart';
 import 'package:oj_helper/utils/contest_utils.dart' show ContestUtils;
@@ -44,8 +44,16 @@ class _RecentContestPageState extends State<RecentContestPage>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
+      drawer: Drawer(),
       appBar: AppBar(
-        title: const Text('近期比赛'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        flexibleSpace: FlexibleSpaceBar(
+          title: const Text('近期比赛'),
+          background: Container(
+            // 设置背景颜色
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
         actions: [
           TextButton.icon(
             label: Text("筛选平台"),
@@ -58,20 +66,17 @@ class _RecentContestPageState extends State<RecentContestPage>
         children: [
           isLoading // 显示加载动画
               ? const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(
+                    color: Colors.black,
+                  ),
                 )
               : _buildBody(),
-          Align(
-            alignment: Alignment.bottomRight, // 右下角
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FloatingActionButton(
-                onPressed: _loadContests, // 加载比赛数据
-                child: const Icon(Icons.search),
-              ),
-            ),
-          ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
+        onPressed: _loadContests,
+        child: const Icon(Icons.search),
       ),
     );
   }

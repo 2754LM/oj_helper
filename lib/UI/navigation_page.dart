@@ -10,6 +10,7 @@ class NavigationPage extends StatefulWidget {
 }
 
 class _NavigationPageState extends State<NavigationPage> {
+  //当前选中项
   int _selectedIndex = 0;
   //页面列表
   final List<Widget> _pages = [
@@ -17,7 +18,6 @@ class _NavigationPageState extends State<NavigationPage> {
     RatingPage(),
     SolvedNumPage(),
   ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

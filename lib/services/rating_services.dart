@@ -20,7 +20,7 @@ class RatingService {
   }
 
   ///获取Atcoder的curRating,maxRating
-  Future<Rating> getAtcoderRating({name = ''}) async {
+  Future<Rating> getAtCoderRating({name = ''}) async {
     final url = "https://atcoder.jp/users/$name";
     Response response = await dio.get(url);
     if (response.statusCode == 200) {
@@ -35,7 +35,7 @@ class RatingService {
   }
 
   ///获取力扣的curRating
-  Future<Rating> getLeetcodeRating({name = ''}) async {
+  Future<Rating> getLeetCodeRating({name = ''}) async {
     final url = 'https://leetcode.cn/graphql/noj-go/';
     final data = {
       "query": """

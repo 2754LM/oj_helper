@@ -15,7 +15,9 @@ dependencies:
   provider: ^6.0.0
   flutter_distributor: ^0.4.0
   shared_preferences: ^2.0.11
-
+  flutter_staggered_grid_view : ^0.4.0
+  flutter_draggable_gridview: ^0.0.12
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -29,4 +31,6 @@ flutter_icons:
 flutter:
   uses-material-design: true
   assets:
-    - assets/  # 声明 assets 文件夹
+    - assets/ 
+    - assets/images/  
+    - assets/platforms/ 
