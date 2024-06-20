@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/rating.dart';
 import 'package:oj_helper/utils/rating_utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RatingPage extends StatefulWidget {
   @override
@@ -22,12 +23,31 @@ class _RatingPageState extends State<RatingPage> {
   @override
   void initState() {
     super.initState();
+    _loadPersistedData(); // 加载持久化数据
     // 初始化每个平台的信息为空
     for (var platformName in _platformNames) {
       _infoMessages[platformName] = null;
       _usernameControllers[platformName] =
           TextEditingController(); // 为每个平台创建控制器
     }
+  }
+
+  // 加载持久化数据
+  Future<void> _loadPersistedData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // 从 SharedPreferences 加载用户名
+    for (var platformName in _platformNames) {
+      String? storedUsername = prefs.getString(platformName);
+      if (storedUsername != null) {
+        _usernameControllers[platformName]!.text = storedUsername;
+      }
+    }
+  }
+
+  // 保存用户输入的用户名
+  Future<void> _saveUsername(String platformName, String username) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(platformName, username);
   }
 
   @override
@@ -112,14 +132,15 @@ class _RatingPageState extends State<RatingPage> {
           ),
         ),
         SizedBox(height: 13),
-        //输入框
+        // 输入框
         Row(
           children: [
             SizedBox(width: 10),
             Expanded(
               flex: 1,
               child: TextFormField(
-                controller: _usernameControllers[platformName], // 使用对应的控制器
+                controller: _usernameControllers[platformName],
+                // 使用对应的控制器
                 decoration: InputDecoration(
                   labelText:
                       selectedPlatform == '牛客' || selectedPlatform == '洛谷'
@@ -129,18 +150,31 @@ class _RatingPageState extends State<RatingPage> {
                   floatingLabelStyle: const TextStyle(color: Colors.blue),
                   focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.blue)),
+                  suffixIcon: _usernameControllers[platformName]!.text.isEmpty
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _usernameControllers[platformName]!.clear();
+                              _saveUsername(platformName, '');
+                            });
+                          },
+                          icon: Icon(Icons.highlight_off),
+                        ),
                 ),
                 onChanged: (text) {
                   setState(() {
                     _infoMessages[platformName] = null;
                   });
-                },
+                  _saveUsername(platformName, text);
+                }, // 保存用户名
               ),
             ),
             SizedBox(width: 20),
           ],
         ),
-        //Rating信息
+
+        // Rating信息
         if (_infoMessages[platformName] != null)
           Text(
             _infoMessages[platformName]!,
