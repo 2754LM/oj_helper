@@ -122,11 +122,13 @@ class RecentContestServices {
             DateTime.parse(startTimeStr).millisecondsSinceEpoch ~/ 1000;
         final endTime =
             DateTime.parse(endTimeStr).millisecondsSinceEpoch ~/ 1000;
+        print(startTime);
+        //unix转标准
         final duration = endTime - startTime;
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
         if (_isIntime(startTime: startTime, duration: duration) == 2) break;
         //添加元素
-        contests.add(Contest.fromJson(title, 0, 0, '牛客'));
+        contests.add(Contest.fromJson(title, startTime, duration, '牛客'));
       }
       return contests;
     } else {

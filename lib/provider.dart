@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/contest.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,7 +51,3 @@ class ContestProvider extends ChangeNotifier {
     notifyListeners(); // 通知监听器更新 UI
   }
 }
-
-class RatingProvider extends ChangeNotifier {}
-
-class SolvedNumProvider extends ChangeNotifier {}

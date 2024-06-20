@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:oj_helper/provider.dart';
-import 'ui/navigation_page.dart';
-import 'ui/recent_contest_page.dart';
-import 'ui/rating_page.dart';
-import 'ui/solved_num_page.dart';
 import 'package:provider/provider.dart';
 
-void main() => runApp(MyApp());
+import 'ui/navigation_page.dart';
+import 'ui/rating_page.dart';
+import 'ui/recent_contest_page.dart';
+import 'ui/solved_num_page.dart';
+
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -16,17 +19,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
             create: (context) => ContestProvider()
               ..loadPlatformSelection()), // 初始化 ContestProvider
-        ChangeNotifierProvider(
-            create: (context) => RatingProvider()), // 初始化 RatingProvider
-        ChangeNotifierProvider(
-            create: (context) => SolvedNumProvider()) // 初始化 SolvedNumProvider,
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
-          colorScheme: ColorScheme.light()
-              .copyWith(primary: const Color.fromARGB(255, 255, 255, 255)),
+          colorScheme: ColorScheme.light().copyWith(primary: Colors.blue),
         ),
         // 注册路由
         routes: {

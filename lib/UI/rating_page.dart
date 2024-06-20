@@ -40,6 +40,7 @@ class _RatingPageState extends State<RatingPage> {
       String? storedUsername = prefs.getString(platformName);
       if (storedUsername != null) {
         _usernameControllers[platformName]!.text = storedUsername;
+        setState(() {});
       }
     }
   }
@@ -58,40 +59,43 @@ class _RatingPageState extends State<RatingPage> {
     precacheImage(AssetImage('assets/platforms/AtCoder.jpg'), context);
     precacheImage(AssetImage('assets/platforms/Codeforces.jpg'), context);
     return Scaffold(
-        drawer: Drawer(),
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          flexibleSpace: FlexibleSpaceBar(
-            title: const Text('分数查询'),
-            background: Container(
-              // 设置背景颜色
-              color: Theme.of(context).colorScheme.primary,
-            ),
+      drawer: Drawer(),
+      appBar: AppBar(
+        flexibleSpace: FlexibleSpaceBar(
+          title: const Text('分数查询'),
+          background: Container(
+            color: Colors.white,
           ),
         ),
-        body: GridView.builder(
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 480,
-            mainAxisExtent: 160,
-          ),
-          itemCount: _platformNames.length,
-          itemBuilder: (context, index) {
-            final platformName = _platformNames[index];
-            return _buildCard(platformName, index);
-          },
-        ),
-        floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.blue,
-            child: const Icon(Icons.search),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            color: Colors.blue,
+            iconSize: 35,
             onPressed: () {
-              // 使用 for 循环遍历所有平台进行查询
+              // 遍历所有平台进行查询
               for (var platformName in _platformNames) {
                 final username = _usernameControllers[platformName]!.text;
                 if (username.isNotEmpty) {
                   _queryRating(platformName, username);
                 }
               }
-            }));
+            },
+          ),
+        ],
+      ),
+      body: GridView.builder(
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 480,
+          mainAxisExtent: 160,
+        ),
+        itemCount: _platformNames.length,
+        itemBuilder: (context, index) {
+          final platformName = _platformNames[index];
+          return _buildCard(platformName, index);
+        },
+      ),
+    );
   }
 
   Widget _buildCard(String platformName, int index) {
