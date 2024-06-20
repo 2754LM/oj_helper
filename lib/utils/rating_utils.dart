@@ -9,11 +9,11 @@ class RatingtUtils {
         return await rs.getCodeforcesRating(name: name);
       case 'AtCoder':
         return await rs.getAtCoderRating(name: name);
-      case 'LeetCode':
+      case '力扣':
         return await rs.getLeetCodeRating(name: name);
-      case 'Nowcoder':
+      case '牛客':
         return await rs.getNowcoderRating(name: name);
-      case 'Luogu':
+      case '洛谷':
         return await rs.getLuoguRating(name: name);
       default:
         throw Exception('没有此平台: $platformName');

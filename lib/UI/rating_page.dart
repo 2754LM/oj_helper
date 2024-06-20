@@ -206,7 +206,7 @@ class _RatingPageState extends State<RatingPage> {
     }
     if (platformName == '力扣') {
       setState(() {
-        _infoMessages[platformName] = '当前rating:$result.curRating';
+        _infoMessages[platformName] = '当前rating:${result?.curRating}';
       });
     } else {
       setState(() {
