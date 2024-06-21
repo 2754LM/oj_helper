@@ -2,7 +2,11 @@
   <img width=200 src="android\app\src\main\res\mipmap-xhdpi\ic_launcher.png"  alt="图标"/>
 
 <div align=center>
+
 一款帮助你查询各大oj信息的应用。
+
+
+[![banner](./doc/banner.png)](https://github.com/2754LM/oj_helper/releases/latest)
 
 ## 平台支持
 
