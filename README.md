@@ -1,6 +1,5 @@
 <div align=center>
-  <img width=200 src="android\app\src\main\res\mipmap-xhdpi
-\ic_launcher.png"  alt="图标"/>
+  <img width=200 src="android\app\src\main\res\mipmap-xhdpi\ic_launcher.png"  alt="图标"/>
   <h1 align="center">oj_helper</h1>
 </div>
 
