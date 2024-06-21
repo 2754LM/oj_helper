@@ -12,7 +12,7 @@ class RatingPage extends StatefulWidget {
 class _RatingPageState extends State<RatingPage> {
   final List<String> _platformNames = [
     'Codeforces',
-    'AtCoder',
+    // 'AtCoder',
     '力扣',
     '洛谷',
     '牛客',

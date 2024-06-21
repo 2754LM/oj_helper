@@ -16,9 +16,11 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'AtCoder',
     '力扣',
     '洛谷',
+    '牛客',
     'VJudge',
     'hdu',
     'poj',
+    'CodeChef',
   ];
 
   Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
@@ -32,6 +34,8 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'VJudge': const Color.fromARGB(255, 255, 165, 0), // 橘黄色
     'hdu': const Color.fromARGB(255, 150, 150, 150), // 中灰色
     'poj': const Color.fromARGB(255, 200, 200, 200), // 浅灰色
+    '牛客': const Color.fromARGB(255, 255, 102, 0), // 橙色
+    'CodeChef': const Color.fromARGB(255, 255, 215, 0) //金黄色
   };
   Map<String, String> shortNmae = {
     // 平台简称
@@ -42,6 +46,8 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'VJudge': 'VJ',
     'hdu': 'HDU',
     'poj': 'POJ',
+    '牛客': '牛客',
+    'CodeChef': 'cchef'
   };
   @override
   void initState() {

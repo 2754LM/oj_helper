@@ -23,7 +23,7 @@ class SolvedNumServices {
 
   ///获取力扣的解题数
   Future<SolvedNum> getLeetCodeRating({name = ''}) async {
-    final url = 'https://leetcode.cn/graphql/';
+    const url = 'https://leetcode.cn/graphql/';
     final data = {
       "query": """
       query userProfileUserQuestionProgressV2(\$userSlug: String!) {
@@ -119,38 +119,22 @@ class SolvedNumServices {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
   }
-  // ///获取hdu的解题数（已废弃）
-  // Future<SolvedNum> getHduRating({name = ''}) async {
-  //   final url = 'https://acm.hdu.edu.cn/userstatus.php?user=$name';
-  //   final response = await dio.get(url);
-  //   if (response.statusCode == 200) {
-  //     final document = parse(response.data);
-  //     final solvedNum = int.parse(document
-  //         .getElementsByTagName('tbody')[4]
-  //         .getElementsByTagName('td')[7]
-  //         .text);
-  //     final links =
-  //         document.querySelectorAll('td:contains("Overall solved") a');
-  //     print(links);
-  //     return SolvedNum(name: name, solvedNum: solvedNum);
-  //   } else {
-  //     throw Exception("请求失败，状态码：${response.statusCode}");
-  //   }
-  // }
 
-  // ///获取poj的解题数（已废弃）
-  // Future<SolvedNum> getPOJRating({name = ''}) async {
-  //   final url = 'http://poj.org/userstatus?user_id=$name';
-  //   final response = await dio.get(url);
-  //   if (response.statusCode == 200) {
-  //     final document = parse(response.data);
-  //     final solvedNum = int.parse(document
-  //         .getElementsByTagName('tbody')[4]
-  //         .getElementsByTagName('a')[0]
-  //         .text);
-  //     return SolvedNum(name: name, solvedNum: solvedNum);
-  //   } else {
-  //     throw Exception("请求失败，状态码：${response.statusCode}");
-  //   }
-  // }
+  //获取牛客网的解题数
+  //数据来源：https://github.com/Liu233w/acm-statistics
+  Future<SolvedNum> getNowcoderRating({name = ''}) async {
+    final url = 'https://ojhunt.com/api/crawlers/nowcoder/$name';
+    final response = await dio.get(url);
+    if (response.statusCode == 200) {
+      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
+    } else {
+      throw Exception("请求失败，状态码：${response.statusCode}");
+    }
+  }
+}
+
+void main() async {
+  final services = SolvedNumServices();
+  final nowcoder = await services.getNowcoderRating(name: '600496114');
+  print(nowcoder.solvedNum);
 }

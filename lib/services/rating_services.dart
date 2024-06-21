@@ -19,16 +19,17 @@ class RatingService {
     }
   }
 
-  ///获取Atcoder的curRating,maxRating
+  ///获取Atcoder的curRating,maxRating(TODO)
   Future<Rating> getAtCoderRating({name = ''}) async {
     final url = "https://atcoder.jp/users/$name";
     Response response = await dio.get(url);
     if (response.statusCode == 200) {
       final document = parse(response.data);
-      final infor = document.getElementsByClassName("user-gray");
-      final curRating = int.parse(infor[1].text);
-      final maxRating = int.parse(infor[2].text);
-      return Rating(name: name, curRating: curRating, maxRating: maxRating);
+      final rating = document.getElementsByClassName('no-break');
+      return Rating(
+          name: name,
+          curRating: int.parse(rating[4].text),
+          maxRating: int.parse(rating[5].text));
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
@@ -36,7 +37,7 @@ class RatingService {
 
   ///获取力扣的curRating
   Future<Rating> getLeetCodeRating({name = ''}) async {
-    final url = 'https://leetcode.cn/graphql/noj-go/';
+    const url = 'https://leetcode.cn/graphql/noj-go/';
     final data = {
       "query": """
       query userContestRankingInfo(\$userSlug: String!) {
@@ -102,6 +103,6 @@ class RatingService {
 
 void main() async {
   RatingService rs = RatingService();
-  Rating tmp = await rs.getLuoguRating(name: '610557');
+  Rating tmp = await rs.getAtCoderRating(name: 'dreamjoker');
   print('${tmp.name}的当前rating为${tmp.curRating}，最大rating为${tmp.maxRating}');
 }

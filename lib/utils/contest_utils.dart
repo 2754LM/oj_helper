@@ -35,7 +35,12 @@ class ContestUtils {
     List<List<Contest>> timeContests = List.generate(7, (index) => <Contest>[]);
     for (Contest contest in recentContestsList) {
       int dif = (contest.startDateTimeDay!.difference(nowTime).inDays).abs();
-      timeContests[dif].add(contest);
+      if (dif >= 7) continue;
+      try {
+        timeContests[dif].add(contest);
+      } catch (e) {
+        rethrow;
+      }
     }
     return timeContests;
   }
