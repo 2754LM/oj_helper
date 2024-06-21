@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/contest.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,12 +9,11 @@ class ContestProvider extends ChangeNotifier {
   Map<String, bool> selectedPlatforms = {
     'Codeforces': true,
     'AtCoder': true,
-    'Luogu': true,
+    '洛谷': true,
     '蓝桥云课': true,
     '力扣': true,
     '牛客': true,
   };
-
   // 本地保存筛选条件
   Future<void> savePlatformSelection() async {
     final prefs = await SharedPreferences.getInstance();
@@ -43,11 +44,18 @@ class ContestProvider extends ChangeNotifier {
     savePlatformSelection(); // 保存数据到 SharedPreferences
   }
 
-  // 近期比赛
-  List<Contest> contests = [];
+  // 近期比赛列表
+  List<List<Contest>> timeContests = [];
   // 更新比赛列表
-  void setContests(List<Contest> newContests) {
-    contests = newContests;
+  void setContests(List<List<Contest>> nowContests) {
+    timeContests = nowContests;
+    notifyListeners(); // 通知监听器更新 UI
+  }
+
+  //显示有无比赛日
+  bool showEmptyDay = true;
+  void toggleShowEmptyDay(bool value) {
+    showEmptyDay = !showEmptyDay;
     notifyListeners(); // 通知监听器更新 UI
   }
 }

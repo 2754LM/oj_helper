@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/rating.dart';
+import 'package:oj_helper/ui/widgets/platform_help.dart';
 import 'package:oj_helper/utils/rating_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,11 +54,6 @@ class _RatingPageState extends State<RatingPage> {
 
   @override
   Widget build(BuildContext context) {
-    precacheImage(AssetImage('assets/platforms/牛客.jpg'), context);
-    precacheImage(AssetImage('assets/platforms/洛谷.jpg'), context);
-    precacheImage(AssetImage('assets/platforms/力扣.jpg'), context);
-    precacheImage(AssetImage('assets/platforms/AtCoder.jpg'), context);
-    precacheImage(AssetImage('assets/platforms/Codeforces.jpg'), context);
     return Scaffold(
       drawer: Drawer(),
       appBar: AppBar(
@@ -121,10 +117,29 @@ class _RatingPageState extends State<RatingPage> {
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Expanded(child: const SizedBox()),
-              IconButton(
-                onPressed: () => null,
-                icon: const Icon(Icons.help),
-              ),
+              if (platformName == '洛谷')
+                IconButton(
+                  onPressed: () async {
+                    await getLuoguPlatformHelp(context);
+                  },
+                  icon: const Icon(Icons.help),
+                ),
+              if (platformName == '牛客')
+                IconButton(
+                  onPressed: () async {
+                    await getNowcoderPlatformHelp(context);
+                  },
+                  icon: const Icon(Icons.help),
+                ),
+              if (platformName == '力扣')
+                IconButton(
+                  onPressed: () async {
+                    await getLeetcodePlatformHelp(context);
+                  },
+                  icon: const Icon(Icons.help),
+                )
+              else
+                Container(),
               IconButton(
                 onPressed: () {
                   return _queryRating(
@@ -200,7 +215,7 @@ class _RatingPageState extends State<RatingPage> {
     }
     Rating? result;
     try {
-      result = await RatingtUtils.getRating(
+      result = await RatingUtils.getRating(
           platformName: platformName, name: username);
     } catch (e) {
       setState(() {

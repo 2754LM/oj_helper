@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Contest {
@@ -7,7 +8,9 @@ class Contest {
   final String duration;
   final String platform;
   final String link;
-  final String monthAndDay;
+  DateTime? startDateTimeDay;
+  final String startHourMinute;
+  final String endHourMinute;
 
   Contest({
     required this.name,
@@ -16,30 +19,39 @@ class Contest {
     this.endTime = '',
     required this.platform,
     this.link = '',
-    this.monthAndDay = '',
+    this.startDateTimeDay = null,
+    this.startHourMinute = '',
+    this.endHourMinute = '',
   });
 
   static Contest fromJson(
       String name, int startTimeSeconds, int durationSeconds, String platform) {
     //格式化时间
     DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
+    DateFormat formatter2 = DateFormat('HH:mm');
     DateTime startTime =
         DateTime.fromMillisecondsSinceEpoch(startTimeSeconds * 1000);
     Duration duration = Duration(seconds: durationSeconds);
     DateTime endTime = startTime.add(duration);
-
     //格式化输出
     String startTimeStr = formatter.format(startTime);
     String endTimeStr = formatter.format(endTime);
     String durationTimeStr =
         '${duration.inHours} 小时 ${duration.inMinutes % 60} 分钟';
-
+    DateTime startDateTimeDay =
+        DateTime(startTime.year, startTime.month, startTime.day, 23, 59, 59);
+    String startHourMinute = formatter2.format(startTime);
+    String endHourMinute = formatter2.format(endTime);
     //返回Contest对象
     return Contest(
-        name: name,
-        startTime: startTimeStr,
-        endTime: endTimeStr,
-        duration: durationTimeStr,
-        platform: platform);
+      name: name,
+      startTime: startTimeStr,
+      endTime: endTimeStr,
+      duration: durationTimeStr,
+      platform: platform,
+      startDateTimeDay: startDateTimeDay,
+      startHourMinute: startHourMinute,
+      endHourMinute: endHourMinute,
+    );
   }
 }

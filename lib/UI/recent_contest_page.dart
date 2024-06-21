@@ -16,6 +16,7 @@ class _RecentContestPageState extends State<RecentContestPage>
   @override
   bool get wantKeepAlive => true;
 
+  // 按日期分类的比赛列表，长度为7
   Dio dio = Dio();
   // 查询天数，默认7天
   int day = 7;
@@ -28,11 +29,11 @@ class _RecentContestPageState extends State<RecentContestPage>
     setState(() {
       isLoading = true;
     });
-    // 获取 Provider 实例
     ContestProvider contestProvider =
         Provider.of<ContestProvider>(context, listen: false);
-    List<Contest> newContests = await ContestUtils.getRecentContests();
-    contestProvider.setContests(newContests); // 更新比赛列表
+    List<List<Contest>> nowContests = await ContestUtils.getRecentContests(
+        day: day, contestProvider: contestProvider);
+    contestProvider.setContests(nowContests);
     if (mounted) {
       setState(() {
         isLoading = false;
@@ -53,6 +54,16 @@ class _RecentContestPageState extends State<RecentContestPage>
           ),
         ),
         actions: [
+          Switch(
+            value: Provider.of<ContestProvider>(context).showEmptyDay,
+            onChanged: (value) {
+              setState(() {
+                Provider.of<ContestProvider>(context, listen: false)
+                    .toggleShowEmptyDay(value);
+              });
+            },
+          ),
+          SizedBox(width: 10),
           IconButton(
             icon: Icon(Icons.filter_alt),
             color: Colors.blue,
@@ -111,13 +122,13 @@ class _RecentContestPageState extends State<RecentContestPage>
               },
             ),
             DialogCheckbox(
-              title: 'Luogu',
-              value: Provider.of<ContestProvider>(context)
-                  .selectedPlatforms['Luogu'],
+              title: '洛谷',
+              value:
+                  Provider.of<ContestProvider>(context).selectedPlatforms['洛谷'],
               onChanged: (value) {
                 setState(() {
                   Provider.of<ContestProvider>(context, listen: false)
-                      .updatePlatformSelection('Luogu', value!);
+                      .updatePlatformSelection('洛谷', value!);
                 });
               },
             ),
@@ -164,39 +175,109 @@ class _RecentContestPageState extends State<RecentContestPage>
         });
   }
 
-  // 构建比赛列表
+  // 构建列表
   Widget _buildBody() {
     return Consumer<ContestProvider>(
       builder: (context, contestProvider, child) {
-        return ListView.separated(
-          itemCount: contestProvider.contests.length,
+        return ListView.builder(
+          itemCount: contestProvider.timeContests.length,
           itemBuilder: (BuildContext context, int index) {
-            if (contestProvider.selectedPlatforms[
-                    contestProvider.contests[index].platform] ==
-                true) {
-              return ListTile(
-                title: Text(contestProvider.contests[index].name),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('开始时间：${contestProvider.contests[index].startTime}'),
-                    Text('结束时间：${contestProvider.contests[index].endTime}'),
-                    Text('比赛时长：${contestProvider.contests[index].duration}'),
-                    Text('比赛平台：${contestProvider.contests[index].platform}'),
-                  ],
-                ),
-              );
-            } else {
-              return Container();
-            }
+            return _buildCard(index, contestProvider.timeContests[index]);
           },
-          separatorBuilder: (BuildContext context, int index) {
-            return Divider(
-              height: 1,
-            );
-          },
+          padding: EdgeInsets.all(5.0),
         );
       },
     );
+  }
+
+  Widget _buildCard(int index, List<Contest> recentContests) {
+    bool flag = false;
+    final dayName = ContestUtils.getDayName(index);
+    for (int i = 0; i < recentContests.length; i++) {
+      if (Provider.of<ContestProvider>(context)
+              .selectedPlatforms[recentContests[i].platform] ==
+          true) {
+        flag = true;
+        break;
+      }
+    }
+    if (!Provider.of<ContestProvider>(context).showEmptyDay && flag == false) {
+      return Container();
+    }
+    return Card.outlined(
+        elevation: 5,
+        shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)))
+            .copyWith(
+                side: const BorderSide(color: Colors.blueAccent, width: 3)),
+        child: Column(
+          children: [
+            ListTile(
+              title: Text(dayName),
+              titleTextStyle: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            Divider(color: Colors.blueAccent, thickness: 3),
+            Column(
+              children: [
+                SizedBox(height: 10),
+                if (!flag)
+                  Text(
+                    '这里没有比赛喵~',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                for (int i = 0; i < recentContests.length; i++) ...[
+                  //是否选中
+                  if (Provider.of<ContestProvider>(context)
+                          .selectedPlatforms[recentContests[i].platform] ==
+                      true) ...[
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Row(children: [
+                        SizedBox(width: 20),
+                        Image.asset(
+                            'assets/platforms/${recentContests[i].platform}.jpg',
+                            width: 30,
+                            height: 30),
+                        SizedBox(width: 20),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                recentContests[i].name,
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                              Text(
+                                '${recentContests[i].startHourMinute} - ${recentContests[i].endHourMinute}',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]),
+                    ),
+                    if (i != recentContests.length - 1) ...[
+                      SizedBox(height: 10),
+                      Divider(color: Colors.blueAccent, thickness: 3),
+                    ]
+                  ]
+                ],
+                SizedBox(height: 20),
+              ],
+            ),
+          ],
+        ));
   }
 }

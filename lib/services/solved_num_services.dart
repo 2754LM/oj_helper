@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart';
 import 'package:oj_helper/models/solved_num.dart' show SolvedNum;
 import 'package:html/parser.dart' show parse;
 
@@ -23,7 +22,7 @@ class SolvedNumServices {
   }
 
   ///获取力扣的解题数
-  Future<SolvedNum> getLeetcodeRating({name = ''}) async {
+  Future<SolvedNum> getLeetCodeRating({name = ''}) async {
     final url = 'https://leetcode.cn/graphql/';
     final data = {
       "query": """
@@ -53,23 +52,6 @@ class SolvedNumServices {
     }
   }
 
-  ///获取洛谷的解题数
-  Future<SolvedNum> getLuoguRating({name = ''}) async {
-    final url = 'https://api.jerryz.com.cn/practice?name=$name';
-    final response = await dio.get(url);
-    if (response.statusCode == 200) {
-      final document = parse(response.data);
-      //格式如：已通过: 1666题    未通过: 59题
-      final infor = document.getElementsByClassName('title')[1];
-      final text = infor.text.trim();
-      final solvedNum =
-          int.parse(RegExp(r'\d+').firstMatch(text)?.group(0) ?? '0');
-      return SolvedNum(name: name, solvedNum: solvedNum);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
-  }
-
   ///获取vjudge的解题数
   Future<SolvedNum> getVJudgeRating({name = ''}) async {
     final url = 'https://vjudge.net/user/$name';
@@ -83,6 +65,18 @@ class SolvedNumServices {
           .getElementsByTagName('a')[0]
           .text);
       return SolvedNum(name: name, solvedNum: solvedNum);
+    } else {
+      throw Exception("请求失败，状态码：${response.statusCode}");
+    }
+  }
+
+  ///获取洛谷的解题数
+  //数据来源：https://github.com/Liu233w/acm-statistics
+  Future<SolvedNum> getLuoguRating({name = ''}) async {
+    final url = 'https://ojhunt.com/api/crawlers/luogu/$name';
+    final response = await dio.get(url);
+    if (response.statusCode == 200) {
+      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
@@ -103,43 +97,60 @@ class SolvedNumServices {
   }
 
   ///获取hdu的解题数
+  //数据来源：https://github.com/Liu233w/acm-statistics
   Future<SolvedNum> getHduRating({name = ''}) async {
-    final url = 'https://acm.hdu.edu.cn/userstatus.php?user=$name';
+    final url = 'https://ojhunt.com/api/crawlers/hdu/$name';
     final response = await dio.get(url);
     if (response.statusCode == 200) {
-      final document = parse(response.data);
-      final solvedNum = int.parse(document
-          .getElementsByTagName('tbody')[4]
-          .getElementsByTagName('td')[7]
-          .text);
-      final links =
-          document.querySelectorAll('td:contains("Overall solved") a');
-      print(links);
-      return SolvedNum(name: name, solvedNum: solvedNum);
+      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
   }
 
   ///获取poj的解题数
+  //数据来源：https://github.com/Liu233w/acm-statistics
   Future<SolvedNum> getPOJRating({name = ''}) async {
-    final url = 'http://poj.org/userstatus?user_id=$name';
+    final url = 'https://ojhunt.com/api/crawlers/poj/$name';
     final response = await dio.get(url);
     if (response.statusCode == 200) {
-      final document = parse(response.data);
-      final solvedNum = int.parse(document
-          .getElementsByTagName('tbody')[4]
-          .getElementsByTagName('a')[0]
-          .text);
-      return SolvedNum(name: name, solvedNum: solvedNum);
+      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
   }
-}
+  // ///获取hdu的解题数（已废弃）
+  // Future<SolvedNum> getHduRating({name = ''}) async {
+  //   final url = 'https://acm.hdu.edu.cn/userstatus.php?user=$name';
+  //   final response = await dio.get(url);
+  //   if (response.statusCode == 200) {
+  //     final document = parse(response.data);
+  //     final solvedNum = int.parse(document
+  //         .getElementsByTagName('tbody')[4]
+  //         .getElementsByTagName('td')[7]
+  //         .text);
+  //     final links =
+  //         document.querySelectorAll('td:contains("Overall solved") a');
+  //     print(links);
+  //     return SolvedNum(name: name, solvedNum: solvedNum);
+  //   } else {
+  //     throw Exception("请求失败，状态码：${response.statusCode}");
+  //   }
+  // }
 
-void main() async {
-  final service = SolvedNumServices();
-  SolvedNum tmp = await service.getPOJRating(name: 'dhu_try');
-  print(tmp.solvedNum);
+  // ///获取poj的解题数（已废弃）
+  // Future<SolvedNum> getPOJRating({name = ''}) async {
+  //   final url = 'http://poj.org/userstatus?user_id=$name';
+  //   final response = await dio.get(url);
+  //   if (response.statusCode == 200) {
+  //     final document = parse(response.data);
+  //     final solvedNum = int.parse(document
+  //         .getElementsByTagName('tbody')[4]
+  //         .getElementsByTagName('a')[0]
+  //         .text);
+  //     return SolvedNum(name: name, solvedNum: solvedNum);
+  //   } else {
+  //     throw Exception("请求失败，状态码：${response.statusCode}");
+  //   }
+  // }
 }

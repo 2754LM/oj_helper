@@ -1,7 +1,7 @@
 import 'package:oj_helper/models/rating.dart' show Rating;
 import 'package:oj_helper/services/rating_services.dart' show RatingService;
 
-class RatingtUtils {
+class RatingUtils {
   static Future<Rating> getRating({platformName = '', name = ''}) async {
     RatingService rs = RatingService();
     switch (platformName) {

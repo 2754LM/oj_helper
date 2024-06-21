@@ -122,7 +122,6 @@ class RecentContestServices {
             DateTime.parse(startTimeStr).millisecondsSinceEpoch ~/ 1000;
         final endTime =
             DateTime.parse(endTimeStr).millisecondsSinceEpoch ~/ 1000;
-        print(startTime);
         //unix转标准
         final duration = endTime - startTime;
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
@@ -149,6 +148,8 @@ class RecentContestServices {
       for (var i = 1; i < upComingContests.length; i++) {
         //解析信息
         final title = upComingContests[i].getElementsByTagName("a")[1].text;
+        final name =
+            title.contains('(') ? title.split('(')[1].split(')')[0] : title;
         final time =
             upComingContests[i].getElementsByClassName("fixtime-full")[0].text;
         final duration = upComingContests[i]
@@ -170,7 +171,7 @@ class RecentContestServices {
         if (_isIntime(startTime: startTime, duration: durationTime) == 2) break;
         //添加元素
         contests
-            .add(Contest.fromJson(title, startTime, durationTime, 'AtCoder'));
+            .add(Contest.fromJson(name, startTime, durationTime, 'AtCoder'));
       }
       return contests;
     } else {
