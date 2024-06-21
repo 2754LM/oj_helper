@@ -14,7 +14,7 @@ class SolvedNumServices {
       final solvedNum = int.parse(document
           .getElementsByClassName('_UserActivityFrame_counterValue')[0]
           .text
-          .substring(0, 2));
+          .split(' ')[0]);
       return SolvedNum(name: name, solvedNum: solvedNum);
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
