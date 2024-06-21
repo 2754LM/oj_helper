@@ -20,7 +20,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'VJudge',
     'hdu',
     'poj',
-    'CodeChef',
+    // 'CodeChef',
   ];
 
   Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
