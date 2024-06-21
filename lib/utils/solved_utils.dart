@@ -20,6 +20,8 @@ class SolvedUtils {
         return await rs.getHduRating(name: name);
       case 'poj':
         return await rs.getPOJRating(name: name);
+      case '牛客':
+        return await rs.getNowcoderRating(name: name);
       default:
         throw Exception('Platform not supported');
     }
