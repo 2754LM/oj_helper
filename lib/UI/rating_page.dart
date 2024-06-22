@@ -10,6 +10,7 @@ class RatingPage extends StatefulWidget {
 }
 
 class _RatingPageState extends State<RatingPage> {
+  // 平台名称
   final List<String> _platformNames = [
     'Codeforces',
     // 'AtCoder',
@@ -17,9 +18,9 @@ class _RatingPageState extends State<RatingPage> {
     '洛谷',
     '牛客',
   ];
-
-  Map<String, String?> _infoMessages = {};
+  Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
   Map<String, TextEditingController> _usernameControllers = {}; // 存储每个平台的控制器
+  Map<String, bool> _isLoading = {}; //存储每个平台是否正在查询
 
   @override
   void initState() {
@@ -27,9 +28,10 @@ class _RatingPageState extends State<RatingPage> {
     _loadPersistedData(); // 加载持久化数据
     // 初始化每个平台的信息为空
     for (var platformName in _platformNames) {
-      _infoMessages[platformName] = null;
+      _infoMessages[platformName] = '';
       _usernameControllers[platformName] =
           TextEditingController(); // 为每个平台创建控制器
+      _isLoading[platformName] = false;
     }
   }
 
@@ -183,7 +185,7 @@ class _RatingPageState extends State<RatingPage> {
                 ),
                 onChanged: (text) {
                   setState(() {
-                    _infoMessages[platformName] = null;
+                    _infoMessages[platformName] = '';
                   });
                   _saveUsername(platformName, text);
                 }, // 保存用户名
@@ -192,9 +194,23 @@ class _RatingPageState extends State<RatingPage> {
             SizedBox(width: 20),
           ],
         ),
-
-        // Rating信息
-        if (_infoMessages[platformName] != null)
+        if (_isLoading[platformName] == true)
+          Row(
+            children: [
+              SizedBox(width: 10),
+              Expanded(
+                child: LinearProgressIndicator(
+                  backgroundColor: const Color.fromARGB(255, 126, 186, 213),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                ),
+              ),
+              SizedBox(width: 20),
+            ],
+          )
+        else
+          const SizedBox(),
+        // 返回Rating信息
+        if (_infoMessages[platformName] != '')
           Text(
             _infoMessages[platformName]!,
             style: TextStyle(
@@ -213,25 +229,35 @@ class _RatingPageState extends State<RatingPage> {
     if (username == '') {
       return;
     }
+    setState(() {
+      _isLoading[platformName] = true;
+    });
     Rating? result;
     try {
       result = await RatingUtils.getRating(
           platformName: platformName, name: username);
     } catch (e) {
-      setState(() {
-        _infoMessages[platformName] = '查询失败，请检查网络或用户名是否正确';
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading[platformName] = false;
+          _infoMessages[platformName] = '查询失败，请检查网络或用户名是否正确';
+        });
+      }
       return;
     }
     if (platformName == '力扣') {
       setState(() {
+        _isLoading[platformName] = false;
         _infoMessages[platformName] = '当前rating:${result?.curRating}';
       });
     } else {
-      setState(() {
-        _infoMessages[platformName] =
-            '当前rating:${result?.curRating}，最高rating:${result?.maxRating}';
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading[platformName] = false;
+          _infoMessages[platformName] =
+              '当前rating:${result?.curRating}，最高rating:${result?.maxRating}';
+        });
+      }
     }
   }
 }

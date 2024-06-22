@@ -11,6 +11,7 @@ class SolvedNumPage extends StatefulWidget {
 }
 
 class _SolvedNumPageState extends State<SolvedNumPage> {
+  // 平台名称
   final List<String> _platformNames = [
     'Codeforces',
     'AtCoder',
@@ -22,10 +23,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'poj',
     // 'CodeChef',
   ];
-
-  Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
-  Map<String, int> _platformSolvedNums = {}; // 存储每个平台的解题数
-  Map<String, TextEditingController> _usernameControllers = {}; // 存储每个平台的控制器
+  // 平台颜色
   Map<String, Color> _platforColor = {
     'Codeforces': const Color.fromARGB(255, 64, 128, 255), // 深蓝色
     'AtCoder': const Color.fromARGB(255, 102, 178, 255), // 中蓝色
@@ -37,8 +35,8 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     '牛客': const Color.fromARGB(255, 255, 102, 0), // 橙色
     'CodeChef': const Color.fromARGB(255, 255, 215, 0) //金黄色
   };
+  // 平台简称
   Map<String, String> shortNmae = {
-    // 平台简称
     'Codeforces': 'CF',
     'AtCoder': 'AtC',
     '力扣': '力扣',
@@ -49,13 +47,19 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     '牛客': '牛客',
     'CodeChef': 'cchef'
   };
+  Map<String, bool> _isLoading = {}; //存储每个平台是否正在查询
+  Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
+  Map<String, int> _platformSolvedNums = {}; // 存储每个平台的解题数
+  Map<String, TextEditingController> _usernameControllers = {}; // 存储每个平台的控制器
+
   @override
   void initState() {
     super.initState();
     _loadPersistedData(); // 加载持久化数据
     // 初始化每个平台的信息为空
     for (var platformName in _platformNames) {
-      _infoMessages[platformName] = null;
+      _isLoading[platformName] = false;
+      _infoMessages[platformName] = '';
       _platformSolvedNums[platformName] = 0;
       _usernameControllers[platformName] =
           TextEditingController(); // 为每个平台创建控制器
@@ -206,10 +210,13 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
           ),
         ],
       ),
+      //显示的card网格
       body: GridView.builder(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 480,
-          mainAxisExtent: 160,
+          // crossAxisSpacing: 10,
+          // mainAxisSpacing: 10,
+          mainAxisExtent: 140,
         ),
         itemCount: _platformNames.length,
         itemBuilder: (context, index) {
@@ -227,12 +234,14 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
       elevation: 5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          //card头部
           Container(
             decoration: BoxDecoration(
               color: Color.fromARGB(172, 211, 218, 220),
             ),
+            //平台信息
             child: Row(
               children: [
                 SizedBox(width: 10),
@@ -287,6 +296,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                 flex: 1,
                 child: TextFormField(
                   controller: _usernameControllers[platformName],
+                  enabled: _isLoading[platformName] == false,
                   // 使用对应的控制器
                   decoration: InputDecoration(
                     labelText:
@@ -304,6 +314,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                               setState(() {
                                 _usernameControllers[platformName]!.clear();
                                 _saveUsername(platformName, '');
+                                _infoMessages[platformName] = '';
                               });
                             },
                             icon: Icon(Icons.highlight_off),
@@ -312,7 +323,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                   onChanged: (text) {
                     setState(() {
                       _platformSolvedNums[platformName] = 0;
-                      _infoMessages[platformName] = null;
+                      _infoMessages[platformName] = '';
                     });
                     _saveUsername(platformName, text);
                   }, // 保存用户名
@@ -321,9 +332,24 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
               SizedBox(width: 20),
             ],
           ),
-
-          // SolvedNum信息
-          if (_infoMessages[platformName] != null)
+          // 进度条
+          if (_isLoading[platformName] == true)
+            Row(
+              children: [
+                SizedBox(width: 10),
+                Expanded(
+                  child: LinearProgressIndicator(
+                    backgroundColor: const Color.fromARGB(255, 126, 186, 213),
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                ),
+                SizedBox(width: 20),
+              ],
+            )
+          else
+            const SizedBox(),
+          //返回信息
+          if (_infoMessages[platformName] != '')
             Text(
               _infoMessages[platformName]!,
               style: TextStyle(
@@ -344,18 +370,25 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     if (username == '') {
       return;
     }
+    setState(() {
+      _isLoading[platformName] = true;
+    });
     SolvedNum? solvedNumResult;
     try {
       solvedNumResult = await SolvedUtils.getSolvedNum(
           platformName: platformName, name: username);
     } catch (e) {
-      setState(() {
-        _infoMessages[platformName] = '查询失败，请检查网络或用户名是否正确';
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading[platformName] = false;
+          _infoMessages[platformName] = '查询失败，请检查网络或用户名是否正确';
+        });
+      }
       return;
     }
     if (mounted) {
       setState(() {
+        _isLoading[platformName] = false;
         _platformSolvedNums[platformName] = solvedNumResult!.solvedNum;
         _infoMessages[platformName] = '已解决：${solvedNumResult.solvedNum}';
       });

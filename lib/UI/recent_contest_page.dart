@@ -26,9 +26,11 @@ class _RecentContestPageState extends State<RecentContestPage>
 
   /// 获取近期比赛
   void _loadContests() async {
-    setState(() {
-      isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
     ContestProvider contestProvider =
         Provider.of<ContestProvider>(context, listen: false);
     List<List<Contest>> nowContests = await ContestUtils.getRecentContests(
@@ -57,10 +59,12 @@ class _RecentContestPageState extends State<RecentContestPage>
           Switch(
             value: Provider.of<ContestProvider>(context).showEmptyDay,
             onChanged: (value) {
-              setState(() {
-                Provider.of<ContestProvider>(context, listen: false)
-                    .toggleShowEmptyDay(value);
-              });
+              if (mounted) {
+                setState(() {
+                  Provider.of<ContestProvider>(context, listen: false)
+                      .toggleShowEmptyDay(value);
+                });
+              }
             },
           ),
           SizedBox(width: 10),
@@ -104,10 +108,12 @@ class _RecentContestPageState extends State<RecentContestPage>
               value: Provider.of<ContestProvider>(context)
                   .selectedPlatforms['Codeforces'],
               onChanged: (value) {
-                setState(() {
-                  Provider.of<ContestProvider>(context, listen: false)
-                      .updatePlatformSelection('Codeforces', value!);
-                });
+                if (mounted) {
+                  setState(() {
+                    Provider.of<ContestProvider>(context, listen: false)
+                        .updatePlatformSelection('Codeforces', value!);
+                  });
+                }
               },
             ),
             DialogCheckbox(
@@ -115,10 +121,12 @@ class _RecentContestPageState extends State<RecentContestPage>
               value: Provider.of<ContestProvider>(context)
                   .selectedPlatforms['AtCoder'],
               onChanged: (value) {
-                setState(() {
-                  Provider.of<ContestProvider>(context, listen: false)
-                      .updatePlatformSelection('AtCoder', value!);
-                });
+                if (mounted) {
+                  setState(() {
+                    Provider.of<ContestProvider>(context, listen: false)
+                        .updatePlatformSelection('AtCoder', value!);
+                  });
+                }
               },
             ),
             DialogCheckbox(
@@ -126,10 +134,12 @@ class _RecentContestPageState extends State<RecentContestPage>
               value:
                   Provider.of<ContestProvider>(context).selectedPlatforms['洛谷'],
               onChanged: (value) {
-                setState(() {
-                  Provider.of<ContestProvider>(context, listen: false)
-                      .updatePlatformSelection('洛谷', value!);
-                });
+                if (mounted) {
+                  setState(() {
+                    Provider.of<ContestProvider>(context, listen: false)
+                        .updatePlatformSelection('洛谷', value!);
+                  });
+                }
               },
             ),
             DialogCheckbox(
@@ -137,10 +147,12 @@ class _RecentContestPageState extends State<RecentContestPage>
               value: Provider.of<ContestProvider>(context)
                   .selectedPlatforms['蓝桥云课'],
               onChanged: (value) {
-                setState(() {
-                  Provider.of<ContestProvider>(context, listen: false)
-                      .updatePlatformSelection('蓝桥云课', value!);
-                });
+                if (mounted) {
+                  setState(() {
+                    Provider.of<ContestProvider>(context, listen: false)
+                        .updatePlatformSelection('蓝桥云课', value!);
+                  });
+                }
               },
             ),
             DialogCheckbox(
@@ -148,10 +160,12 @@ class _RecentContestPageState extends State<RecentContestPage>
               value:
                   Provider.of<ContestProvider>(context).selectedPlatforms['力扣'],
               onChanged: (value) {
-                setState(() {
-                  Provider.of<ContestProvider>(context, listen: false)
-                      .updatePlatformSelection('力扣', value!);
-                });
+                if (mounted) {
+                  setState(() {
+                    Provider.of<ContestProvider>(context, listen: false)
+                        .updatePlatformSelection('力扣', value!);
+                  });
+                }
               },
             ),
             DialogCheckbox(
@@ -159,10 +173,12 @@ class _RecentContestPageState extends State<RecentContestPage>
               value:
                   Provider.of<ContestProvider>(context).selectedPlatforms['牛客'],
               onChanged: (value) {
-                setState(() {
-                  Provider.of<ContestProvider>(context, listen: false)
-                      .updatePlatformSelection('牛客', value!);
-                });
+                if (mounted) {
+                  setState(() {
+                    Provider.of<ContestProvider>(context, listen: false)
+                        .updatePlatformSelection('牛客', value!);
+                  });
+                }
               },
             ),
             ElevatedButton(

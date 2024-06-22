@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         // title: 'Flutter Demo',
         theme: ThemeData(
+          useMaterial3: true,
           colorScheme: ColorScheme.light().copyWith(primary: Colors.blue),
         ),
         // 注册路由
