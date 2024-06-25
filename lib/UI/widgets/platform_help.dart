@@ -38,22 +38,3 @@ Future<void> getNowcoderPlatformHelp(BuildContext context) async {
         );
       });
 }
-
-Future<void> getLuoguPlatformHelp(BuildContext context) async {
-  showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('提示'),
-          titleTextStyle: TextStyle(
-              fontSize: 20.0, color: Colors.black, fontWeight: FontWeight.bold),
-          content: Text(
-            '访问个人主页，右侧用户编号即id',
-            style: TextStyle(
-              fontSize: 16.0,
-              height: 1.5,
-            ),
-          ),
-        );
-      });
-}

@@ -10,7 +10,7 @@ class RatingUtils {
       case 'AtCoder':
         return await rs.getAtCoderRating(name: name);
       case '力扣':
-        return await rs.getLeetCodeRating(name: name);
+        return (await rs.getLeetCodeRating(name: name)).last;
       case '牛客':
         return await rs.getNowcoderRating(name: name);
       case '洛谷':
@@ -18,5 +18,11 @@ class RatingUtils {
       default:
         throw Exception('没有此平台: $platformName');
     }
+  }
+
+  static Future<List<Rating>> getRatingList(
+      {platformName = '', name = ''}) async {
+    RatingService rs = RatingService();
+    return (await rs.getLeetCodeRating(name: name));
   }
 }

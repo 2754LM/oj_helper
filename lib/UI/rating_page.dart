@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/rating.dart';
 import 'package:oj_helper/ui/widgets/platform_help.dart';
@@ -13,7 +14,7 @@ class _RatingPageState extends State<RatingPage> {
   // 平台名称
   final List<String> _platformNames = [
     'Codeforces',
-    // 'AtCoder',
+    'AtCoder',
     '力扣',
     '洛谷',
     '牛客',
@@ -21,7 +22,7 @@ class _RatingPageState extends State<RatingPage> {
   Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
   Map<String, TextEditingController> _usernameControllers = {}; // 存储每个平台的控制器
   Map<String, bool> _isLoading = {}; //存储每个平台是否正在查询
-
+  Map<String, List<Rating>> _ratingList = {}; // 存储每个平台Rating历史
   @override
   void initState() {
     super.initState();
@@ -54,6 +55,69 @@ class _RatingPageState extends State<RatingPage> {
     await prefs.setString(platformName, username);
   }
 
+  // 加载折线图
+  Future<void> _loadLineChartData() async {
+    Map<String, LineChartBarData> lineChartBarData = {};
+    Map<String, List<FlSpot>> spots = {};
+    for (var i in _ratingList.keys) {
+      spots[i] = [];
+      for (var j in _ratingList[i]!) {
+        spots[i]!.add(FlSpot(j.time.toDouble(), j.curRating.toDouble()));
+      }
+      lineChartBarData[i] = LineChartBarData(
+        spots: spots[i]!,
+        isCurved: true,
+        barWidth: 3,
+        color: Colors.blue,
+        dotData: FlDotData(
+          show: true,
+        ),
+      );
+    }
+    if (_ratingList.isEmpty) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return SimpleDialog(
+              title: Text('提示'),
+              children: [
+                Text('暂无数据，请先查询题目',
+                    style: const TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
+                    maxLines: 2),
+              ],
+            );
+          });
+      return;
+    }
+    lineChartBarData['tmp'] = LineChartBarData(
+      spots: [
+        FlSpot(1, 1),
+        FlSpot(2, 2),
+        FlSpot(3, 3),
+        FlSpot(4, 4),
+        FlSpot(5, 5),
+      ],
+      isCurved: true,
+      barWidth: 3,
+      color: Colors.blue,
+      dotData: FlDotData(
+        show: true,
+      ),
+    );
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            children: [
+              LineChart(
+                LineChartData(lineBarsData: [lineChartBarData['tmp']!]),
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +130,14 @@ class _RatingPageState extends State<RatingPage> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.show_chart),
+            color: Colors.blue,
+            iconSize: 35,
+            onPressed: () async {
+              await _loadLineChartData();
+            },
+          ),
           IconButton(
             icon: Icon(Icons.search),
             color: Colors.blue,
@@ -119,13 +191,6 @@ class _RatingPageState extends State<RatingPage> {
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Expanded(child: const SizedBox()),
-              if (platformName == '洛谷')
-                IconButton(
-                  onPressed: () async {
-                    await getLuoguPlatformHelp(context);
-                  },
-                  icon: const Icon(Icons.help),
-                ),
               if (platformName == '牛客')
                 IconButton(
                   onPressed: () async {
@@ -163,10 +228,7 @@ class _RatingPageState extends State<RatingPage> {
                 controller: _usernameControllers[platformName],
                 // 使用对应的控制器
                 decoration: InputDecoration(
-                  labelText:
-                      selectedPlatform == '牛客' || selectedPlatform == '洛谷'
-                          ? 'id'
-                          : '用户名',
+                  labelText: selectedPlatform == '牛客' ? 'id' : '用户名',
                   labelStyle: const TextStyle(color: Colors.grey),
                   floatingLabelStyle: const TextStyle(color: Colors.blue),
                   focusedBorder: UnderlineInputBorder(
@@ -236,6 +298,8 @@ class _RatingPageState extends State<RatingPage> {
     try {
       result = await RatingUtils.getRating(
           platformName: platformName, name: username);
+      _ratingList['LeetCode'] = await RatingUtils.getRatingList(
+          platformName: 'LeetCode', name: username);
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -245,19 +309,12 @@ class _RatingPageState extends State<RatingPage> {
       }
       return;
     }
-    if (platformName == '力扣') {
+    if (mounted) {
       setState(() {
         _isLoading[platformName] = false;
-        _infoMessages[platformName] = '当前rating:${result?.curRating}';
+        _infoMessages[platformName] =
+            '当前rating:${result?.curRating}，最高rating:${result?.maxRating}';
       });
-    } else {
-      if (mounted) {
-        setState(() {
-          _isLoading[platformName] = false;
-          _infoMessages[platformName] =
-              '当前rating:${result?.curRating}，最高rating:${result?.maxRating}';
-        });
-      }
     }
   }
 }

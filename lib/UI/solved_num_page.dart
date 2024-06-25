@@ -4,6 +4,7 @@ import 'package:oj_helper/models/solved_num.dart';
 import 'package:oj_helper/ui/widgets/platform_help.dart';
 import 'package:oj_helper/utils/solved_utils.dart' show SolvedUtils;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class SolvedNumPage extends StatefulWidget {
   @override
@@ -132,7 +133,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     }
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return SimpleDialog(
           title: Text('解题统计'),
           children: [
@@ -211,17 +212,12 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
         ],
       ),
       //显示的card网格
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 480,
-          // crossAxisSpacing: 10,
-          // mainAxisSpacing: 10,
-          mainAxisExtent: 140,
-        ),
+      body: StaggeredGridView.extentBuilder(
+        maxCrossAxisExtent: 480,
+        staggeredTileBuilder: (index) => StaggeredTile.fit(1),
         itemCount: _platformNames.length,
         itemBuilder: (context, index) {
-          final platformName = _platformNames[index];
-          return _buildCard(platformName, index);
+          return _buildCard(_platformNames[index], index);
         },
       ),
     );
@@ -254,13 +250,6 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Expanded(child: const SizedBox()),
-                if (platformName == '洛谷')
-                  IconButton(
-                    onPressed: () async {
-                      await getLuoguPlatformHelp(context);
-                    },
-                    icon: const Icon(Icons.help),
-                  ),
                 if (platformName == '牛客')
                   IconButton(
                     onPressed: () async {
@@ -299,10 +288,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                   enabled: _isLoading[platformName] == false,
                   // 使用对应的控制器
                   decoration: InputDecoration(
-                    labelText:
-                        selectedPlatform == '牛客' || selectedPlatform == '洛谷'
-                            ? 'id'
-                            : '用户名',
+                    labelText: selectedPlatform == '牛客' ? 'id' : '用户名',
                     labelStyle: const TextStyle(color: Colors.grey),
                     floatingLabelStyle: const TextStyle(color: Colors.blue),
                     focusedBorder: UnderlineInputBorder(

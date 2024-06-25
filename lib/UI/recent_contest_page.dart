@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/contest.dart' show Contest;
@@ -15,12 +17,11 @@ class _RecentContestPageState extends State<RecentContestPage>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-
+  final platForms = ['Codeforces', 'AtCoder', '洛谷', '蓝桥云课', '力扣', '牛客'];
   // 按日期分类的比赛列表，长度为7
   Dio dio = Dio();
   // 查询天数，默认7天
   int day = 7;
-
   // 加载状态
   bool isLoading = false;
 
@@ -56,17 +57,6 @@ class _RecentContestPageState extends State<RecentContestPage>
           ),
         ),
         actions: [
-          Switch(
-            value: Provider.of<ContestProvider>(context).showEmptyDay,
-            onChanged: (value) {
-              if (mounted) {
-                setState(() {
-                  Provider.of<ContestProvider>(context, listen: false)
-                      .toggleShowEmptyDay(value);
-                });
-              }
-            },
-          ),
           SizedBox(width: 10),
           IconButton(
             icon: Icon(Icons.filter_alt),
@@ -102,92 +92,49 @@ class _RecentContestPageState extends State<RecentContestPage>
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return SimpleDialog(title: Text('筛选平台'), children: [
-            DialogCheckbox(
-              title: 'Codeforces',
-              value: Provider.of<ContestProvider>(context)
-                  .selectedPlatforms['Codeforces'],
-              onChanged: (value) {
-                if (mounted) {
-                  setState(() {
-                    Provider.of<ContestProvider>(context, listen: false)
-                        .updatePlatformSelection('Codeforces', value!);
-                  });
-                }
-              },
+          return SimpleDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            DialogCheckbox(
-              title: 'AtCoder',
-              value: Provider.of<ContestProvider>(context)
-                  .selectedPlatforms['AtCoder'],
-              onChanged: (value) {
-                if (mounted) {
-                  setState(() {
-                    Provider.of<ContestProvider>(context, listen: false)
-                        .updatePlatformSelection('AtCoder', value!);
-                  });
-                }
-              },
-            ),
-            DialogCheckbox(
-              title: '洛谷',
-              value:
-                  Provider.of<ContestProvider>(context).selectedPlatforms['洛谷'],
-              onChanged: (value) {
-                if (mounted) {
-                  setState(() {
-                    Provider.of<ContestProvider>(context, listen: false)
-                        .updatePlatformSelection('洛谷', value!);
-                  });
-                }
-              },
-            ),
-            DialogCheckbox(
-              title: '蓝桥云课',
-              value: Provider.of<ContestProvider>(context)
-                  .selectedPlatforms['蓝桥云课'],
-              onChanged: (value) {
-                if (mounted) {
-                  setState(() {
-                    Provider.of<ContestProvider>(context, listen: false)
-                        .updatePlatformSelection('蓝桥云课', value!);
-                  });
-                }
-              },
-            ),
-            DialogCheckbox(
-              title: '力扣',
-              value:
-                  Provider.of<ContestProvider>(context).selectedPlatforms['力扣'],
-              onChanged: (value) {
-                if (mounted) {
-                  setState(() {
-                    Provider.of<ContestProvider>(context, listen: false)
-                        .updatePlatformSelection('力扣', value!);
-                  });
-                }
-              },
-            ),
-            DialogCheckbox(
-              title: '牛客',
-              value:
-                  Provider.of<ContestProvider>(context).selectedPlatforms['牛客'],
-              onChanged: (value) {
-                if (mounted) {
-                  setState(() {
-                    Provider.of<ContestProvider>(context, listen: false)
-                        .updatePlatformSelection('牛客', value!);
-                  });
-                }
-              },
-            ),
-            ElevatedButton(
-              child: Text('确定'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ]);
+            children: [
+              Row(children: [
+                SizedBox(width: 20),
+                Text(
+                  '显示无赛程日',
+                  style: TextStyle(fontSize: 18, color: Colors.black),
+                ),
+                Spacer(),
+                Switch(
+                  value: Provider.of<ContestProvider>(context).showEmptyDay,
+                  onChanged: (value) {
+                    if (mounted) {
+                      setState(() {
+                        Provider.of<ContestProvider>(context, listen: false)
+                            .toggleShowEmptyDay(value);
+                      });
+                    }
+                  },
+                ),
+                SizedBox(width: 20),
+              ]),
+              for (var name in platForms) ...[
+                Divider(color: Colors.grey, thickness: 1.5),
+                DialogCheckbox(
+                  title: name,
+                  value: Provider.of<ContestProvider>(context)
+                      .selectedPlatforms[name],
+                  onChanged: (value) {
+                    if (mounted) {
+                      setState(() {
+                        Provider.of<ContestProvider>(context, listen: false)
+                            .updatePlatformSelection(name, value!);
+                      });
+                    }
+                  },
+                ),
+              ]
+            ],
+          );
         });
   }
 
