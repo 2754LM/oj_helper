@@ -62,7 +62,7 @@ class ContestUtils {
   static String getDayName(int index) {
     switch (index) {
       case 0:
-        return '今日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[nowTime.weekday]}';
+        return '今日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[nowTime.weekday % 7]}';
       case 1:
         return '明日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 1) % 7]}';
       case 2:
