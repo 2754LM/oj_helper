@@ -20,8 +20,8 @@ class ContestUtils {
     if (selectPlatforms?['牛客'] == true) {
       recentContestsList.addAll(await rC.getNowcoderContests());
     }
-    if (selectPlatforms?['Atcoder'] == true) {
-      recentContestsList.addAll(await rC.getAtcoderContests());
+    if (selectPlatforms?['AtCoder'] == true) {
+      recentContestsList.addAll(await rC.getAtCoderContests());
     }
     if (selectPlatforms?['Luogu'] == true) {
       recentContestsList.addAll(await rC.getLuoguContests());
