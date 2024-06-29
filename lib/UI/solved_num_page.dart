@@ -212,19 +212,25 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
         ],
       ),
       //显示的card网格
-      body: StaggeredGridView.extentBuilder(
-        maxCrossAxisExtent: 480,
-        staggeredTileBuilder: (index) => StaggeredTile.fit(1),
-        itemCount: _platformNames.length,
-        itemBuilder: (context, index) {
-          return _buildCard(_platformNames[index], index);
-        },
+      body: Wrap(
+        children: [
+          for (var i in _platformNames) ...[
+            _buildCard(i),
+          ]
+          // StaggeredGridView.extentBuilder(
+          //   maxCrossAxisExtent: 480,
+          //   staggeredTileBuilder: (index) => StaggeredTile.fit(1),
+          //   itemCount: _platformNames.length,
+          //   itemBuilder: (context, index) {
+          //     return _buildCard(_platformNames[index], index);
+          //   },
+          // ),
+        ],
       ),
     );
   }
 
-  Widget _buildCard(String platformName, int index) {
-    final selectedPlatform = platformName;
+  Widget _buildCard(String platformName) {
     return Card(
       key: ValueKey(platformName),
       elevation: 5,
@@ -288,7 +294,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                   enabled: _isLoading[platformName] == false,
                   // 使用对应的控制器
                   decoration: InputDecoration(
-                    labelText: selectedPlatform == '牛客' ? 'id' : '用户名',
+                    labelText: platformName == '牛客' ? 'id' : '用户名',
                     labelStyle: const TextStyle(color: Colors.grey),
                     floatingLabelStyle: const TextStyle(color: Colors.blue),
                     focusedBorder: UnderlineInputBorder(

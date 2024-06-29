@@ -3,6 +3,7 @@ import 'rating_page.dart';
 import 'recent_contest_page.dart';
 import 'solved_num_page.dart';
 import 'favorites_page.dart';
+import 'package:flutter_xupdate/flutter_xupdate.dart';
 
 class NavigationPage extends StatefulWidget {
   @override
@@ -10,6 +11,14 @@ class NavigationPage extends StatefulWidget {
 }
 
 class _NavigationPageState extends State<NavigationPage> {
+  final updateUrl = 'https://api.github.com/2754LM/oj_helper/releases/latest';
+  @override
+  void initState() {
+    super.initState();
+    FlutterXUpdate.init();
+    //安卓自动更新（todo）
+  }
+
   //当前选中项
   int _selectedIndex = 0;
   //页面列表

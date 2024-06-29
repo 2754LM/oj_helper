@@ -136,7 +136,7 @@ class RecentContestServices {
   }
 
   ///获取Atcoder比赛
-  Future<List<Contest>> getAtcoderContests() async {
+  Future<List<Contest>> getAtCoderContests() async {
     Response response = await dio.get(_atcoderUrl);
     if (response.statusCode == 200) {
       List<Contest> contests = [];
@@ -234,7 +234,7 @@ class RecentContestServices {
 
 void main() async {
   final recentContest = RecentContestServices();
-  final atc = await recentContest.getNowcoderContests();
+  final atc = await recentContest.getAtCoderContests();
   for (var contest in atc) {
     print('${contest.name} ${contest.startTime} ${contest.duration}');
   }

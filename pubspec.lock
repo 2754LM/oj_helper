@@ -210,18 +210,18 @@ packages:
     dependency: transitive
     description:
       name: flutter_app_publisher
-      sha256: "73700f116b8b5f96c68ce2d167a8972090fb30a8968d632267e5de1c2a4bd666"
+      sha256: "01e8b0695640d03574e01c910cf545256dccd8232d0003195ea8b2cca4cc9e53"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.4"
+    version: "0.4.2"
   flutter_distributor:
     dependency: "direct main"
     description:
       name: flutter_distributor
-      sha256: "05b93a8cffc88ff222fad8e9802bec764967c077b15c9a7596c8c8642f7d9377"
+      sha256: ab1c80b0253777f7a1ae26279c127a6bbf0c7602c951e14ebd8f3f28106880d5
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.4"
+    version: "0.4.3"
   flutter_draggable_gridview:
     dependency: "direct main"
     description:
@@ -264,6 +264,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_xupdate:
+    dependency: "direct main"
+    description:
+      name: flutter_xupdate
+      sha256: aa78176757d8cf483e7acb4ac6279b87f5a6fabc1bacb465009efac036e16ebb
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   get_it:
     dependency: transitive
     description:
@@ -280,30 +288,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  google_identity_services_web:
-    dependency: transitive
-    description:
-      name: google_identity_services_web
-      sha256: "9482364c9f8b7bd36902572ebc3a7c2b5c8ee57a9c93e6eb5099c1a9ec5265d8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.1+1"
   googleapis:
     dependency: transitive
     description:
       name: googleapis
-      sha256: "864f222aed3f2ff00b816c675edf00a39e2aaf373d728d8abec30b37bee1a81c"
+      sha256: dfea9984f0785ed445ba78e2aa8c55dadd86d6a60ea9e0ffbadad51edb5e7e36
       url: "https://pub.dev"
     source: hosted
-    version: "13.2.0"
+    version: "9.2.0"
   googleapis_auth:
     dependency: transitive
     description:
       name: googleapis_auth
-      sha256: befd71383a955535060acde8792e7efc11d2fccd03dd1d3ec434e85b68775938
+      sha256: af7c3a3edf9d0de2e1e0a77e994fae0a581c525fa7012af4fa0d4a52ed9484da
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.0"
+    version: "1.4.1"
   html:
     dependency: "direct main"
     description:
@@ -316,10 +316,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: "761a297c042deedc1ffbb156d6e2af13886bb305c2a343a4d972504cd67dd938"
+      sha256: "5895291c13fa8a3bd82e76d5627f69e0d85ca6a30dcac95c4ea19a5d555879c2"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.1"
+    version: "0.13.6"
   http_parser:
     dependency: transitive
     description:
@@ -352,6 +352,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.7"
   json_annotation:
     dependency: transitive
     description:
@@ -464,6 +472,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  package_info_plus:
+    dependency: transitive
+    description:
+      name: package_info_plus
+      sha256: "10259b111176fba5c505b102e3a5b022b51dd97e30522e906d6922c745584745"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.2"
+  package_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: package_info_plus_platform_interface
+      sha256: "9bc8ba46813a4cc42c66ab781470711781940780fd8beddd0c3da62506d3a6c6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   parse_app_package:
     dependency: transitive
     description:
@@ -761,10 +785,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: a79dbe579cb51ecd6d30b17e0cae4e0ea15e2c0e66f69ad4198f22a6789e94f4
+      sha256: "5a751eddf9db89b3e5f9d50c20ab8612296e4e8db69009788d6c8b060a84191c"
       url: "https://pub.dev"
     source: hosted
-    version: "5.5.1"
+    version: "4.1.4"
   xdg_directories:
     dependency: transitive
     description:
