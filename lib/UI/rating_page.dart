@@ -39,7 +39,6 @@ class _RatingPageState extends State<RatingPage> {
   // 加载持久化数据
   Future<void> _loadPersistedData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // 从 SharedPreferences 加载用户名
     for (var platformName in _platformNames) {
       String? storedUsername = prefs.getString(platformName);
       if (storedUsername != null) {
@@ -55,8 +54,17 @@ class _RatingPageState extends State<RatingPage> {
     await prefs.setString(platformName, username);
   }
 
-  // 加载折线图
+  // 加载折线图(TODO)
   Future<void> _loadLineChartData() async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('别急，没做完'),
+          );
+        });
+    return;
+
     Map<String, LineChartBarData> lineChartBarData = {};
     Map<String, List<FlSpot>> spots = {};
     for (var i in _ratingList.keys) {
@@ -90,21 +98,6 @@ class _RatingPageState extends State<RatingPage> {
           });
       return;
     }
-    lineChartBarData['tmp'] = LineChartBarData(
-      spots: [
-        FlSpot(1, 1),
-        FlSpot(2, 2),
-        FlSpot(3, 3),
-        FlSpot(4, 4),
-        FlSpot(5, 5),
-      ],
-      isCurved: true,
-      barWidth: 3,
-      color: Colors.blue,
-      dotData: FlDotData(
-        show: true,
-      ),
-    );
     showDialog(
         context: context,
         builder: (context) {
@@ -121,10 +114,9 @@ class _RatingPageState extends State<RatingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(),
       appBar: AppBar(
+        title: const Text('分数查询'),
         flexibleSpace: FlexibleSpaceBar(
-          title: const Text('分数查询'),
           background: Container(
             color: Colors.white,
           ),
@@ -162,13 +154,13 @@ class _RatingPageState extends State<RatingPage> {
         itemCount: _platformNames.length,
         itemBuilder: (context, index) {
           final platformName = _platformNames[index];
-          return _buildCard(platformName, index);
+          return _buildCard(platformName);
         },
       ),
     );
   }
 
-  Widget _buildCard(String platformName, int index) {
+  Widget _buildCard(String platformName) {
     final selectedPlatform = platformName;
     return Card(
       key: ValueKey(platformName),

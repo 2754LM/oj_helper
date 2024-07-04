@@ -4,7 +4,6 @@ import 'package:oj_helper/models/solved_num.dart';
 import 'package:oj_helper/ui/widgets/platform_help.dart';
 import 'package:oj_helper/utils/solved_utils.dart' show SolvedUtils;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class SolvedNumPage extends StatefulWidget {
   @override
@@ -67,10 +66,9 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     }
   }
 
-  // 加载持久化数据
+  // 加载数据
   Future<void> _loadPersistedData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // 从 SharedPreferences 加载用户名
     for (var platformName in _platformNames) {
       String? storedUsername = prefs.getString(platformName);
       if (storedUsername != null) {
@@ -178,12 +176,11 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(),
       appBar: AppBar(
+        title: const Text('题数统计'),
         flexibleSpace: FlexibleSpaceBar(
-          title: const Text('题目统计'), // 设置标题
           background: Container(
-            color: Colors.white, // 设置背景颜色
+            color: Colors.white,
           ),
         ),
         actions: [
@@ -212,20 +209,17 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
         ],
       ),
       //显示的card网格
-      body: Wrap(
-        children: [
-          for (var i in _platformNames) ...[
-            _buildCard(i),
-          ]
-          // StaggeredGridView.extentBuilder(
-          //   maxCrossAxisExtent: 480,
-          //   staggeredTileBuilder: (index) => StaggeredTile.fit(1),
-          //   itemCount: _platformNames.length,
-          //   itemBuilder: (context, index) {
-          //     return _buildCard(_platformNames[index], index);
-          //   },
-          // ),
-        ],
+      body: GridView.builder(
+        shrinkWrap: true,
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 480,
+          mainAxisExtent: 160,
+        ),
+        itemCount: _platformNames.length,
+        itemBuilder: (context, index) {
+          final platformName = _platformNames[index];
+          return _buildCard(platformName);
+        },
       ),
     );
   }

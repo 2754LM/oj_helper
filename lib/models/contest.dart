@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Contest {
@@ -7,25 +6,35 @@ class Contest {
   final String endTime;
   final String duration;
   final String platform;
-  final String link;
+  final String? link;
   DateTime? startDateTimeDay;
   final String startHourMinute;
   final String endHourMinute;
-
+  int startTimeSeconds;
+  int durationSeconds;
+  String formattedStartTime;
+  String formattedEndTime;
+  String fomattedDuration;
   Contest({
     required this.name,
     required this.startTime,
     required this.duration,
     this.endTime = '',
     required this.platform,
-    this.link = '',
-    this.startDateTimeDay = null,
+    this.link,
+    this.startDateTimeDay,
     this.startHourMinute = '',
     this.endHourMinute = '',
+    this.startTimeSeconds = 0,
+    this.durationSeconds = 0,
+    this.formattedStartTime = '',
+    this.formattedEndTime = '',
+    this.fomattedDuration = '',
   });
 
   static Contest fromJson(
-      String name, int startTimeSeconds, int durationSeconds, String platform) {
+      String name, int startTimeSeconds, int durationSeconds, String platform,
+      [String? link]) {
     //格式化时间
     DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
     DateFormat formatter2 = DateFormat('HH:mm');
@@ -52,6 +61,12 @@ class Contest {
       startDateTimeDay: startDateTimeDay,
       startHourMinute: startHourMinute,
       endHourMinute: endHourMinute,
+      link: link,
+      startTimeSeconds: startTimeSeconds,
+      durationSeconds: durationSeconds,
+      formattedStartTime: startTimeStr,
+      formattedEndTime: endTimeStr,
+      fomattedDuration: durationTimeStr,
     );
   }
 }

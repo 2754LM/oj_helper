@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/contest.dart' show Contest;
@@ -7,6 +5,8 @@ import 'package:oj_helper/provider.dart';
 import 'package:oj_helper/ui/widgets/dialog_checkbox.dart' show DialogCheckbox;
 import 'package:oj_helper/utils/contest_utils.dart' show ContestUtils;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RecentContestPage extends StatefulWidget {
   @override
@@ -25,7 +25,7 @@ class _RecentContestPageState extends State<RecentContestPage>
   // 加载状态
   bool isLoading = false;
 
-  /// 获取近期比赛
+  ///获取近期比赛
   void _loadContests() async {
     if (mounted) {
       setState(() {
@@ -44,20 +44,51 @@ class _RecentContestPageState extends State<RecentContestPage>
     }
   }
 
+  //收藏比赛
+  void _favoriteContest(Contest contest) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String infor =
+        '${contest.name},${contest.startTimeSeconds},${contest.durationSeconds},${contest.platform},${contest.link}';
+    if (prefs.containsKey(contest.name)) {
+      await prefs.remove(contest.name);
+      String? cur = prefs.getString('favourite_contests');
+      List<String> contestNames = [];
+      if (cur == null) {
+        prefs.setString('favourite_contests', '');
+        setState(() {});
+        return;
+      }
+      contestNames = cur.split(',');
+      contestNames.remove(contest.name);
+      prefs.setString('favourite_contests', contestNames.join(','));
+    } else {
+      await prefs.setString(contest.name, infor);
+      String? cur = prefs.getString('favourite_contests');
+      List<String> contestNames = [];
+      if (cur == null) {
+        prefs.setString('favourite_contests', '');
+        setState(() {});
+        return;
+      }
+      contestNames = cur.split(',');
+      contestNames.add(contest.name);
+      prefs.setString('favourite_contests', contestNames.join(','));
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      drawer: Drawer(),
       appBar: AppBar(
+        title: const Text('近期比赛'),
         flexibleSpace: FlexibleSpaceBar(
-          title: const Text('近期比赛'),
           background: Container(
             color: Colors.white,
           ),
         ),
         actions: [
-          SizedBox(width: 10),
           IconButton(
             icon: Icon(Icons.filter_alt),
             color: Colors.blue,
@@ -154,7 +185,7 @@ class _RecentContestPageState extends State<RecentContestPage>
   }
 
   Widget _buildCard(int index, List<Contest> recentContests) {
-    bool flag = false;
+    bool flag = false; //是否有赛事
     final dayName = ContestUtils.getDayName(index);
     for (int i = 0; i < recentContests.length; i++) {
       if (Provider.of<ContestProvider>(context)
@@ -183,6 +214,7 @@ class _RecentContestPageState extends State<RecentContestPage>
                   color: Colors.black),
             ),
             Divider(color: Colors.blueAccent, thickness: 3),
+            //每天具体赛事
             Column(
               children: [
                 SizedBox(height: 10),
@@ -194,8 +226,8 @@ class _RecentContestPageState extends State<RecentContestPage>
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   ),
+                //每个比赛
                 for (int i = 0; i < recentContests.length; i++) ...[
-                  //是否选中
                   if (Provider.of<ContestProvider>(context)
                           .selectedPlatforms[recentContests[i].platform] ==
                       true) ...[
@@ -203,6 +235,7 @@ class _RecentContestPageState extends State<RecentContestPage>
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: Row(children: [
                         SizedBox(width: 20),
+                        // 平台图标
                         Image.asset(
                             'assets/platforms/${recentContests[i].platform}.jpg',
                             width: 30,
@@ -212,13 +245,46 @@ class _RecentContestPageState extends State<RecentContestPage>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                recentContests[i].name,
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black),
+                              InkWell(
+                                onTap: () {
+                                  if (recentContests[i].link != null) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text('确认访问？'),
+                                        titleTextStyle: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text('取消'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              launchUrl(Uri.parse(
+                                                  recentContests[i].link!));
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('确定'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Text(
+                                  recentContests[i].name,
+                                  maxLines: 5,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
                               ),
+                              //比赛时间
                               Text(
                                 '${recentContests[i].startHourMinute} - ${recentContests[i].endHourMinute}',
                                 style: TextStyle(
@@ -227,6 +293,33 @@ class _RecentContestPageState extends State<RecentContestPage>
                                     fontWeight: FontWeight.bold),
                               ),
                             ],
+                          ),
+                        ),
+                        Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20.0), // 添加水平间距
+                          child: FutureBuilder<bool>(
+                            future: _isFavorite(recentContests[i]),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return IconButton(
+                                  onPressed: () {
+                                    _favoriteContest(recentContests[i]);
+                                    // 更新收藏状态
+                                  },
+                                  iconSize: 28,
+                                  icon: Icon(
+                                      snapshot.data!
+                                          ? Icons.star
+                                          : Icons.star_border,
+                                      color: snapshot.data!
+                                          ? Colors.amber
+                                          : Colors.black),
+                                );
+                              } else {
+                                return CircularProgressIndicator();
+                              }
+                            },
                           ),
                         ),
                       ]),
@@ -242,5 +335,10 @@ class _RecentContestPageState extends State<RecentContestPage>
             ),
           ],
         ));
+  }
+
+  Future<bool> _isFavorite(Contest contest) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.containsKey(contest.name);
   }
 }
