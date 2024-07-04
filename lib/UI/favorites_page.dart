@@ -77,6 +77,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       prefs.setString('favourite_contests', contestNames.join(','));
     }
     favoriteContests.remove(contest);
+    setState(() {});
   }
 
   // //比赛通知
@@ -127,234 +128,250 @@ class _FavoritesPageState extends State<FavoritesPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('添加比赛'),
-        content: Wrap(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.max,
+        content: Builder(builder: (context) {
+          return SingleChildScrollView(
+            child: Wrap(
               children: [
-                // 输入比赛名称
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration: const InputDecoration(labelText: '比赛名称'),
-                    onChanged: (value) {
-                      name = value;
-                    },
-                  ),
-                ),
-                // 选择比赛平台
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(labelText: '比赛平台'),
-                    value: platform,
-                    items: platforms.map((String item) {
-                      return DropdownMenuItem<String>(
-                        value: item,
-                        child: Text(
-                          item,
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        platform = value!;
-                      });
-                    },
-                  ),
-                ),
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Text('添加比赛', style: TextStyle(fontSize: 20)),
+                    // 输入比赛名称
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        decoration: const InputDecoration(labelText: '比赛名称'),
+                        onChanged: (value) {
+                          name = value;
+                        },
+                      ),
+                    ),
+                    // 输入比赛链接
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        decoration: const InputDecoration(labelText: '比赛链接'),
+                        onChanged: (value) {
+                          link = value;
+                        },
+                      ),
+                    ),
+                    // 选择比赛平台
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: '比赛平台'),
+                        value: platform,
+                        items: platforms.map((String item) {
+                          return DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(
+                              item,
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            platform = value!;
+                          });
+                        },
+                      ),
+                    ),
 
-                // 输入比赛链接
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration: const InputDecoration(labelText: '比赛链接'),
-                    onChanged: (value) {
-                      link = value;
-                    },
-                  ),
-                ),
-                // 开始时间
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: startTimeController,
-                    decoration: const InputDecoration(
-                      labelText: '开始时间',
-                      labelStyle: TextStyle(color: Colors.grey),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black, width: 1),
+                    // 开始时间
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: startTimeController,
+                        decoration: const InputDecoration(
+                          labelText: '开始时间',
+                          labelStyle: TextStyle(color: Colors.grey),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 1),
+                          ),
+                        ),
+                        readOnly: true,
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
-                    readOnly: true,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          DateTime? cur = await showDatePicker(
-                            context: context,
-                            initialDate: nowTime,
-                            firstDate: nowTime.subtract(Duration(days: 365)),
-                            lastDate: nowTime.add(Duration(days: 720)),
-                            locale: Locale('zh', 'CN'),
-                          );
-                          startYMDseconds = cur?.millisecondsSinceEpoch ?? 0;
-                          startYMDseconds ~/= 1000;
-                          startTime = startYMDseconds + startHMseconds;
-                          startTimeController.text = format.format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                  startTime * 1000));
-                          setState(() {});
-                        },
-                        style: ButtonStyle(
-                          shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(0))),
-                        ),
-                        child: const Text(
-                          '日期',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          Navigator.of(context).push(
-                            showPicker(
-                                okText: '确定',
-                                cancelText: '取消',
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              DateTime? cur = await showDatePicker(
                                 context: context,
-                                value: Time(
-                                    hour: nowTime.hour, minute: nowTime.minute),
-                                is24HrFormat: true,
-                                onChange: (cur) {
-                                  startHMseconds =
-                                      cur.hour * 3600 + cur.minute * 60;
-                                  startTime = startYMDseconds + startHMseconds;
-                                  startTimeController.text = format.format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          startTime * 1000));
-                                  setState(() {});
-                                }),
-                          );
-                        },
-                        style: ButtonStyle(
-                          shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(0))),
+                                initialDate: nowTime,
+                                firstDate:
+                                    nowTime.subtract(Duration(days: 365)),
+                                lastDate: nowTime.add(Duration(days: 720)),
+                                locale: Locale('zh', 'CN'),
+                              );
+                              startYMDseconds =
+                                  cur?.millisecondsSinceEpoch ?? 0;
+                              startYMDseconds ~/= 1000;
+                              startTime = startYMDseconds + startHMseconds;
+                              startTimeController.text = format.format(
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      startTime * 1000));
+                              setState(() {});
+                            },
+                            style: ButtonStyle(
+                              shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0))),
+                            ),
+                            child: const Text(
+                              '日期',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal),
+                            ),
+                          ),
                         ),
-                        child: Text(
-                          '时分',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).push(
+                                showPicker(
+                                    okText: '确定',
+                                    cancelText: '取消',
+                                    context: context,
+                                    value: Time(
+                                        hour: nowTime.hour,
+                                        minute: nowTime.minute),
+                                    is24HrFormat: true,
+                                    onChange: (cur) {
+                                      startHMseconds =
+                                          cur.hour * 3600 + cur.minute * 60;
+                                      startTime =
+                                          startYMDseconds + startHMseconds;
+                                      startTimeController.text = format.format(
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              startTime * 1000));
+                                      setState(() {});
+                                    }),
+                              );
+                            },
+                            style: ButtonStyle(
+                              shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0))),
+                            ),
+                            child: Text(
+                              '时分',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal),
+                            ),
+                          ),
                         ),
+                      ],
+                    ),
+                    // 结束时间
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: endTimeController,
+                        decoration: const InputDecoration(
+                          labelText: '结束时间',
+                          labelStyle: TextStyle(color: Colors.grey),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 1),
+                          ),
+                        ),
+                        readOnly: true,
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
-                  ],
-                ),
-                // 结束时间
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: endTimeController,
-                    decoration: const InputDecoration(
-                      labelText: '结束时间',
-                      labelStyle: TextStyle(color: Colors.grey),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black, width: 1),
-                      ),
-                    ),
-                    readOnly: true,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          DateTime? cur = await showDatePicker(
-                            context: context,
-                            initialDate: nowTime,
-                            firstDate: nowTime.subtract(Duration(days: 365)),
-                            lastDate: nowTime.add(Duration(days: 720)),
-                            locale: Locale('zh', 'CN'),
-                          );
-                          endYMDseconds = cur?.millisecondsSinceEpoch ?? 0;
-                          endYMDseconds ~/= 1000;
-                          endTime = endYMDseconds + endHMseconds;
-                          endTimeController.text = format.format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                  endTime * 1000));
-                          setState(() {});
-                        },
-                        style: ButtonStyle(
-                          shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(0))),
-                        ),
-                        child: const Text(
-                          '日期',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          Navigator.of(context).push(
-                            showPicker(
-                                okText: '确定',
-                                cancelText: '取消',
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              DateTime? cur = await showDatePicker(
                                 context: context,
-                                value: Time(
-                                    hour: nowTime.hour, minute: nowTime.minute),
-                                is24HrFormat: true,
-                                onChange: (cur) {
-                                  endHMseconds =
-                                      cur.hour * 3600 + cur.minute * 60;
-                                  endTime = endYMDseconds + endHMseconds;
-                                  endTimeController.text = format.format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          endTime * 1000));
-                                  setState(() {});
-                                }),
-                          );
-                        },
-                        style: ButtonStyle(
-                          shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(0))),
+                                initialDate: nowTime,
+                                firstDate:
+                                    nowTime.subtract(Duration(days: 365)),
+                                lastDate: nowTime.add(Duration(days: 720)),
+                                locale: Locale('zh', 'CN'),
+                              );
+                              endYMDseconds = cur?.millisecondsSinceEpoch ?? 0;
+                              endYMDseconds ~/= 1000;
+                              endTime = endYMDseconds + endHMseconds;
+                              endTimeController.text = format.format(
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      endTime * 1000));
+                              setState(() {});
+                            },
+                            style: ButtonStyle(
+                              shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0))),
+                            ),
+                            child: const Text(
+                              '日期',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal),
+                            ),
+                          ),
                         ),
-                        child: Text(
-                          '时分',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).push(
+                                showPicker(
+                                    okText: '确定',
+                                    cancelText: '取消',
+                                    context: context,
+                                    value: Time(
+                                        hour: nowTime.hour,
+                                        minute: nowTime.minute),
+                                    is24HrFormat: true,
+                                    onChange: (cur) {
+                                      endHMseconds =
+                                          cur.hour * 3600 + cur.minute * 60;
+                                      endTime = endYMDseconds + endHMseconds;
+                                      endTimeController.text = format.format(
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              endTime * 1000));
+                                      setState(() {});
+                                    }),
+                              );
+                            },
+                            style: ButtonStyle(
+                              shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0))),
+                            ),
+                            child: Text(
+                              '时分',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
               ],
             ),
-          ],
-        ),
+          );
+        }),
         actions: [
           TextButton(
             onPressed: () {
