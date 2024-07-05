@@ -64,51 +64,6 @@ class _RatingPageState extends State<RatingPage> {
           );
         });
     return;
-
-    Map<String, LineChartBarData> lineChartBarData = {};
-    Map<String, List<FlSpot>> spots = {};
-    for (var i in _ratingList.keys) {
-      spots[i] = [];
-      for (var j in _ratingList[i]!) {
-        spots[i]!.add(FlSpot(j.time.toDouble(), j.curRating.toDouble()));
-      }
-      lineChartBarData[i] = LineChartBarData(
-        spots: spots[i]!,
-        isCurved: true,
-        barWidth: 3,
-        color: Colors.blue,
-        dotData: FlDotData(
-          show: true,
-        ),
-      );
-    }
-    if (_ratingList.isEmpty) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return SimpleDialog(
-              title: Text('提示'),
-              children: [
-                Text('暂无数据，请先查询题目',
-                    style: const TextStyle(fontSize: 18),
-                    textAlign: TextAlign.center,
-                    maxLines: 2),
-              ],
-            );
-          });
-      return;
-    }
-    showDialog(
-        context: context,
-        builder: (context) {
-          return SimpleDialog(
-            children: [
-              LineChart(
-                LineChartData(lineBarsData: [lineChartBarData['tmp']!]),
-              ),
-            ],
-          );
-        });
   }
 
   @override
@@ -290,8 +245,6 @@ class _RatingPageState extends State<RatingPage> {
     try {
       result = await RatingUtils.getRating(
           platformName: platformName, name: username);
-      _ratingList['LeetCode'] = await RatingUtils.getRatingList(
-          platformName: 'LeetCode', name: username);
     } catch (e) {
       if (mounted) {
         setState(() {
