@@ -23,7 +23,7 @@ class ContestUtils {
     if (selectPlatforms?['AtCoder'] == true) {
       recentContestsList.addAll(await rC.getAtCoderContests());
     }
-    if (selectPlatforms?['Luogu'] == true) {
+    if (selectPlatforms?['洛谷'] == true) {
       recentContestsList.addAll(await rC.getLuoguContests());
     }
     if (selectPlatforms?['蓝桥云课'] == true) {

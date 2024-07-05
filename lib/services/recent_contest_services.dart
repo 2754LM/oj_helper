@@ -240,3 +240,8 @@ class RecentContestServices {
     }
   }
 }
+
+void main() {
+  RecentContestServices recentContestServices = RecentContestServices();
+  recentContestServices.getLuoguContests();
+}
