@@ -1,4 +1,3 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/rating.dart';
 import 'package:oj_helper/ui/widgets/platform_help.dart';
