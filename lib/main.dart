@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:oj_helper/provider.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'ui/navigation_page.dart';
-import 'ui/rating_page.dart';
-import 'ui/recent_contest_page.dart';
-import 'ui/solved_num_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -21,18 +19,18 @@ class MyApp extends StatelessWidget {
               ..loadPlatformSelection()), // 初始化 ContestProvider
       ],
       child: MaterialApp(
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('zh', 'CN'),
+        ],
         debugShowCheckedModeBanner: false,
-        // title: 'Flutter Demo',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.light().copyWith(primary: Colors.blue),
         ),
-        // 注册路由
-        routes: {
-          '/比赛': (context) => RecentContestPage(), // 比赛页面
-          '/分数': (context) => RatingPage(), // 分数页面
-          '/题量': (context) => SolvedNumPage(), // 题量页面
-        },
         home: NavigationPage(), // 使用 NavigationPage 作为根页面
       ),
     );

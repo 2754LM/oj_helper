@@ -10,8 +10,9 @@ class RecentContestServices {
       "https://mirror.codeforces.com/api/contest.list?gym=false";
   final _luoguUrl =
       "https://www.luogu.com.cn/contest/list?page=1&_contentOnly=1";
-  final lanqiaoUrl =
+  final _lanqiaoUrl =
       "https://www.lanqiao.cn/api/v2/contests/?sort=opentime&paginate=0&status=not_finished&game_type_code=2";
+  final _nowcoderUrl = "https://ac.nowcoder.com/acm/contest/vip-index";
   final Dio dio = Dio();
   final int _nowSconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   int _queryEndSeconds = 7 * 24 * 60 * 60; //最晚时间
@@ -42,6 +43,7 @@ class RecentContestServices {
           title
           startTime
           duration
+          titleSlug
         }
       }
       """
@@ -60,11 +62,13 @@ class RecentContestServices {
         final name = contestList[i]['title'];
         final startTime = contestList[i]['startTime'];
         final duration = contestList[i]['duration'];
+        final link =
+            "https://leetcode.cn/contest/${contestList[i]['titleSlug']}";
         //判断时间范围
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
         if (_isIntime(startTime: startTime, duration: duration) == 2) break;
         //添加信息
-        contests.add(Contest.fromJson(name, startTime, duration, "力扣"));
+        contests.add(Contest.fromJson(name, startTime, duration, "力扣", link));
       }
       return contests;
     } else {
@@ -86,8 +90,8 @@ class RecentContestServices {
         //判断时间范围
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
         if (_isIntime(startTime: startTime, duration: duration) == 2) break;
-        contests.add(Contest.fromJson(
-            contestList[i]['name'], startTime, duration, 'Codeforces'));
+        contests.add(Contest.fromJson(contestList[i]['name'], startTime,
+            duration, 'Codeforces', 'https://mirror.codeforces.com/contests'));
       }
       return contests;
     } else {
@@ -97,8 +101,7 @@ class RecentContestServices {
 
   ///获取牛客比赛
   Future<List<Contest>> getNowcoderContests() async {
-    Response response =
-        await dio.get("https://ac.nowcoder.com/acm/contest/vip-index");
+    Response response = await dio.get(_nowcoderUrl);
     if (response.statusCode == 200) {
       List<Contest> contests = [];
       //解析html
@@ -106,6 +109,8 @@ class RecentContestServices {
       final contestList = document.getElementsByClassName("platform-item-main");
       for (var i = 0; i < contestList.length; i++) {
         final title = contestList[i].getElementsByTagName("a")[0].text;
+        final link =
+            "https://ac.nowcoder.com${contestList[i].getElementsByTagName("a")[0].attributes['href']!}";
         //time格式如下
         // 比赛时间：    2024-06-23 19:00
         //  至     2024-06-23 21:00
@@ -127,7 +132,7 @@ class RecentContestServices {
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
         if (_isIntime(startTime: startTime, duration: duration) == 2) break;
         //添加元素
-        contests.add(Contest.fromJson(title, startTime, duration, '牛客'));
+        contests.add(Contest.fromJson(title, startTime, duration, '牛客', link));
       }
       return contests;
     } else {
@@ -148,8 +153,10 @@ class RecentContestServices {
       for (var i = 1; i < upComingContests.length; i++) {
         //解析信息
         final title = upComingContests[i].getElementsByTagName("a")[1].text;
+        final link =
+            "https://atcoder.jp${upComingContests[i].getElementsByTagName("a")[1].attributes['href']!}";
         final name =
-            title.contains('(') ? title.split('(')[1].split(')')[0] : title;
+            title.contains('（') ? title.split('（')[1].split('）')[0] : title;
         final time =
             upComingContests[i].getElementsByClassName("fixtime-full")[0].text;
         final duration = upComingContests[i]
@@ -170,8 +177,8 @@ class RecentContestServices {
         }
         if (_isIntime(startTime: startTime, duration: durationTime) == 2) break;
         //添加元素
-        contests
-            .add(Contest.fromJson(name, startTime, durationTime, 'AtCoder'));
+        contests.add(
+            Contest.fromJson(name, startTime, durationTime, 'AtCoder', link));
       }
       return contests;
     } else {
@@ -188,13 +195,14 @@ class RecentContestServices {
       for (var i = 0; i < contestList.length; i++) {
         if (contestList[i]['rated'] == false && isRated == true) continue;
         final name = contestList[i]['name'];
+        final link = "https://www.luogu.com.cn/contest/${contestList[i]['id']}";
         final startTime = contestList[i]['startTime'];
         final duration = contestList[i]['endTime'] - startTime;
         //判断时间范围
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
         if (_isIntime(startTime: startTime, duration: duration) == 2) break;
         //添加元素
-        contests.add(Contest.fromJson(name, startTime, duration, '洛谷'));
+        contests.add(Contest.fromJson(name, startTime, duration, '洛谷', link));
       }
       return contests;
     } else {
@@ -204,11 +212,12 @@ class RecentContestServices {
 
   ///获取蓝桥杯比赛
   Future<List<Contest>> getLanqiaoContests() async {
-    Response response = await dio.get(lanqiaoUrl);
+    Response response = await dio.get(_lanqiaoUrl);
     if (response.statusCode == 200) {
       List<Contest> contests = [];
       for (var i = 0; i < response.data.length; i++) {
         final name = response.data[i]['name'];
+        final link = "https://www.lanqiao.cn/${response.data[i]['html_url']}";
         //time格式如2024-06-29T19:00:00+08:00
         final time = response.data[i]['open_at'];
         DateFormat starttimeFormat = DateFormat('yyyy-MM-ddTHH:mm:ssZ');
@@ -223,7 +232,7 @@ class RecentContestServices {
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
         if (_isIntime(startTime: startTime, duration: duration) == 2) break;
         //添加元素
-        contests.add(Contest.fromJson(name, startTime, duration, '蓝桥云课'));
+        contests.add(Contest.fromJson(name, startTime, duration, '蓝桥云课', link));
       }
       return contests;
     } else {
@@ -232,10 +241,7 @@ class RecentContestServices {
   }
 }
 
-void main() async {
-  final recentContest = RecentContestServices();
-  final atc = await recentContest.getNowcoderContests();
-  for (var contest in atc) {
-    print('${contest.name} ${contest.startTime} ${contest.duration}');
-  }
+void main() {
+  RecentContestServices recentContestServices = RecentContestServices();
+  recentContestServices.getLuoguContests();
 }

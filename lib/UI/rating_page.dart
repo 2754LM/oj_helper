@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/rating.dart';
 import 'package:oj_helper/ui/widgets/platform_help.dart';
@@ -13,7 +14,7 @@ class _RatingPageState extends State<RatingPage> {
   // 平台名称
   final List<String> _platformNames = [
     'Codeforces',
-    // 'AtCoder',
+    'AtCoder',
     '力扣',
     '洛谷',
     '牛客',
@@ -21,7 +22,7 @@ class _RatingPageState extends State<RatingPage> {
   Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
   Map<String, TextEditingController> _usernameControllers = {}; // 存储每个平台的控制器
   Map<String, bool> _isLoading = {}; //存储每个平台是否正在查询
-
+  Map<String, List<Rating>> _ratingList = {}; // 存储每个平台Rating历史
   @override
   void initState() {
     super.initState();
@@ -38,7 +39,6 @@ class _RatingPageState extends State<RatingPage> {
   // 加载持久化数据
   Future<void> _loadPersistedData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // 从 SharedPreferences 加载用户名
     for (var platformName in _platformNames) {
       String? storedUsername = prefs.getString(platformName);
       if (storedUsername != null) {
@@ -54,18 +54,37 @@ class _RatingPageState extends State<RatingPage> {
     await prefs.setString(platformName, username);
   }
 
+  // 加载折线图(TODO)
+  Future<void> _loadLineChartData() async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('别急，没做完'),
+          );
+        });
+    return;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(),
       appBar: AppBar(
+        title: const Text('分数查询'),
         flexibleSpace: FlexibleSpaceBar(
-          title: const Text('分数查询'),
           background: Container(
             color: Colors.white,
           ),
         ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.show_chart),
+            color: Colors.blue,
+            iconSize: 35,
+            onPressed: () async {
+              await _loadLineChartData();
+            },
+          ),
           IconButton(
             icon: Icon(Icons.search),
             color: Colors.blue,
@@ -90,13 +109,13 @@ class _RatingPageState extends State<RatingPage> {
         itemCount: _platformNames.length,
         itemBuilder: (context, index) {
           final platformName = _platformNames[index];
-          return _buildCard(platformName, index);
+          return _buildCard(platformName);
         },
       ),
     );
   }
 
-  Widget _buildCard(String platformName, int index) {
+  Widget _buildCard(String platformName) {
     final selectedPlatform = platformName;
     return Card(
       key: ValueKey(platformName),
@@ -119,13 +138,6 @@ class _RatingPageState extends State<RatingPage> {
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Expanded(child: const SizedBox()),
-              if (platformName == '洛谷')
-                IconButton(
-                  onPressed: () async {
-                    await getLuoguPlatformHelp(context);
-                  },
-                  icon: const Icon(Icons.help),
-                ),
               if (platformName == '牛客')
                 IconButton(
                   onPressed: () async {
@@ -163,10 +175,7 @@ class _RatingPageState extends State<RatingPage> {
                 controller: _usernameControllers[platformName],
                 // 使用对应的控制器
                 decoration: InputDecoration(
-                  labelText:
-                      selectedPlatform == '牛客' || selectedPlatform == '洛谷'
-                          ? 'id'
-                          : '用户名',
+                  labelText: selectedPlatform == '牛客' ? 'id' : '用户名',
                   labelStyle: const TextStyle(color: Colors.grey),
                   floatingLabelStyle: const TextStyle(color: Colors.blue),
                   focusedBorder: UnderlineInputBorder(
@@ -245,19 +254,12 @@ class _RatingPageState extends State<RatingPage> {
       }
       return;
     }
-    if (platformName == '力扣') {
+    if (mounted) {
       setState(() {
         _isLoading[platformName] = false;
-        _infoMessages[platformName] = '当前rating:${result?.curRating}';
+        _infoMessages[platformName] =
+            '当前rating:${result?.curRating}，最高rating:${result?.maxRating}';
       });
-    } else {
-      if (mounted) {
-        setState(() {
-          _isLoading[platformName] = false;
-          _infoMessages[platformName] =
-              '当前rating:${result?.curRating}，最高rating:${result?.maxRating}';
-        });
-      }
     }
   }
 }

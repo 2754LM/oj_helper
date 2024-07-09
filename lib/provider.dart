@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/contest.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,8 +24,7 @@ class ContestProvider extends ChangeNotifier {
   // 加载筛选条件
   Future<void> loadPlatformSelection() async {
     final prefs = await SharedPreferences.getInstance();
-    final platformList =
-        prefs.getStringList('selectedPlatforms') ?? []; // 不需要类型转换
+    final platformList = prefs.getStringList('selectedPlatforms') ?? [];
     for (final entry in platformList) {
       final parts = entry.split(':');
       if (parts.length == 2) {

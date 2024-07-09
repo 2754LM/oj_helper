@@ -23,7 +23,7 @@ class ContestUtils {
     if (selectPlatforms?['AtCoder'] == true) {
       recentContestsList.addAll(await rC.getAtCoderContests());
     }
-    if (selectPlatforms?['Luogu'] == true) {
+    if (selectPlatforms?['洛谷'] == true) {
       recentContestsList.addAll(await rC.getLuoguContests());
     }
     if (selectPlatforms?['蓝桥云课'] == true) {
@@ -58,25 +58,16 @@ class ContestUtils {
     0: '日',
   };
   //获取日期对应名称
-
   static String getDayName(int index) {
-    switch (index) {
-      case 0:
-        return '今日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[nowTime.weekday]}';
-      case 1:
-        return '明日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 1) % 7]}';
-      case 2:
-        return '后日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 2) % 7]}';
-      case 3:
-        return '${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 3) % 7]}';
-      case 4:
-        return '${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 4) % 7]}';
-      case 5:
-        return '${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 5) % 7]}';
-      case 6:
-        return '${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 6) % 7]}';
-      default:
-        return '';
+    if (index < 0 || index > 6) return '';
+    if (index == 0) {
+      return '今日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[nowTime.weekday % 7]}';
+    } else if (index == 1) {
+      return '明日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 1) % 7]}';
+    } else if (index == 2) {
+      return '后日   ${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + 2) % 7]}';
+    } else {
+      return '${formatter.format(nowTime.add(Duration(days: index)))} 周${weekdayMap[(nowTime.weekday + index) % 7]}';
     }
   }
 }

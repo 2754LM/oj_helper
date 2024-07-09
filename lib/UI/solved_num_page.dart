@@ -66,10 +66,9 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     }
   }
 
-  // 加载持久化数据
+  // 加载数据
   Future<void> _loadPersistedData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // 从 SharedPreferences 加载用户名
     for (var platformName in _platformNames) {
       String? storedUsername = prefs.getString(platformName);
       if (storedUsername != null) {
@@ -132,7 +131,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     }
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return SimpleDialog(
           title: Text('解题统计'),
           children: [
@@ -177,12 +176,11 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(),
       appBar: AppBar(
+        title: const Text('题数统计'),
         flexibleSpace: FlexibleSpaceBar(
-          title: const Text('题目统计'), // 设置标题
           background: Container(
-            color: Colors.white, // 设置背景颜色
+            color: Colors.white,
           ),
         ),
         actions: [
@@ -212,23 +210,21 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
       ),
       //显示的card网格
       body: GridView.builder(
+        shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 480,
-          // crossAxisSpacing: 10,
-          // mainAxisSpacing: 10,
-          mainAxisExtent: 140,
+          mainAxisExtent: 160,
         ),
         itemCount: _platformNames.length,
         itemBuilder: (context, index) {
           final platformName = _platformNames[index];
-          return _buildCard(platformName, index);
+          return _buildCard(platformName);
         },
       ),
     );
   }
 
-  Widget _buildCard(String platformName, int index) {
-    final selectedPlatform = platformName;
+  Widget _buildCard(String platformName) {
     return Card(
       key: ValueKey(platformName),
       elevation: 5,
@@ -254,13 +250,6 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Expanded(child: const SizedBox()),
-                if (platformName == '洛谷')
-                  IconButton(
-                    onPressed: () async {
-                      await getLuoguPlatformHelp(context);
-                    },
-                    icon: const Icon(Icons.help),
-                  ),
                 if (platformName == '牛客')
                   IconButton(
                     onPressed: () async {
@@ -299,10 +288,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                   enabled: _isLoading[platformName] == false,
                   // 使用对应的控制器
                   decoration: InputDecoration(
-                    labelText:
-                        selectedPlatform == '牛客' || selectedPlatform == '洛谷'
-                            ? 'id'
-                            : '用户名',
+                    labelText: platformName == '牛客' ? 'id' : '用户名',
                     labelStyle: const TextStyle(color: Colors.grey),
                     floatingLabelStyle: const TextStyle(color: Colors.blue),
                     focusedBorder: UnderlineInputBorder(
