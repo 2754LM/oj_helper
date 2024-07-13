@@ -168,7 +168,7 @@ class RecentContestServices {
         //原格式duration：02:00
         DateFormat starttimeFormat = DateFormat('yyyy-MM-dd HH:mm:ssZ');
         final startTime =
-            starttimeFormat.parse(time).millisecondsSinceEpoch ~/ 1000;
+            starttimeFormat.parse(time).millisecondsSinceEpoch ~/ 1000 - 3600;
         int durationTime =
             int.parse(duration[0]) * 3600 + int.parse(duration[1]) * 60;
         //判断时间范围
@@ -241,7 +241,10 @@ class RecentContestServices {
   }
 }
 
-void main() {
+void main() async {
   RecentContestServices recentContestServices = RecentContestServices();
-  recentContestServices.getLuoguContests();
+  final atc = await recentContestServices.getAtCoderContests();
+  for (var i in atc) {
+    print('${i.name} ${i.startTime} ${i.duration} ${i.endTime} ${i.link}');
+  }
 }
