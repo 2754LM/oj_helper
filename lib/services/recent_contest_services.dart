@@ -168,7 +168,7 @@ class RecentContestServices {
         //原格式duration：02:00
         DateFormat starttimeFormat = DateFormat('yyyy-MM-dd HH:mm:ssZ');
         final startTime =
-            starttimeFormat.parse(time).millisecondsSinceEpoch ~/ 1000;
+            starttimeFormat.parse(time).millisecondsSinceEpoch ~/ 1000 - 3600;
         int durationTime =
             int.parse(duration[0]) * 3600 + int.parse(duration[1]) * 60;
         //判断时间范围
@@ -217,7 +217,8 @@ class RecentContestServices {
       List<Contest> contests = [];
       for (var i = 0; i < response.data.length; i++) {
         final name = response.data[i]['name'];
-        final link = "https://www.lanqiao.cn/${response.data[i]['html_url']}";
+        final link = "https://www.lanqiao.cn${response.data[i]['html_url']}";
+        print(link);
         //time格式如2024-06-29T19:00:00+08:00
         final time = response.data[i]['open_at'];
         DateFormat starttimeFormat = DateFormat('yyyy-MM-ddTHH:mm:ssZ');
@@ -241,7 +242,7 @@ class RecentContestServices {
   }
 }
 
-void main() {
+void main() async {
   RecentContestServices recentContestServices = RecentContestServices();
-  recentContestServices.getLuoguContests();
+  final atc = await recentContestServices.getLanqiaoContests();
 }
