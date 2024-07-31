@@ -131,10 +131,39 @@ class SolvedNumServices {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
   }
+
+  //获取蓝桥云课解题数(TODO)
+  Future<SolvedNum> getLanqiaoContests({String name = ''}) async {
+    var testurl = 'https://www.lanqiao.cn/users/$name/';
+    final response = await dio.get(testurl);
+    if (response.statusCode != 200) {
+      throw Exception("请求失败，状态码：${response.statusCode}");
+    }
+    List<Future> futures = [];
+    for (int i = 1; i <= 400; i++) {
+      var url =
+          'https://www.lanqiao.cn/api/v2/user/prepare-match/problem-rank/?page_size=100&&page=$i';
+      futures.add(dio.get(url));
+    }
+    var responses = await Future.wait(futures);
+    for (var response in responses) {
+      if (response.statusCode == 200) {
+        var list = response.data['data'];
+        for (var j in list) {
+          if (j['user_id'].toString() == name) {
+            return SolvedNum(name: name, solvedNum: j['problem_count']);
+          }
+        }
+      } else {
+        throw Exception("请求失败，状态码：${response.statusCode}");
+      }
+    }
+    return SolvedNum(name: name, solvedNum: 0);
+  }
 }
 
 void main() async {
   final services = SolvedNumServices();
-  final nowcoder = await services.getNowcoderRating(name: '600496114');
+  final nowcoder = await services.getLanqiaoContests(name: '2328736');
   print(nowcoder.solvedNum);
 }

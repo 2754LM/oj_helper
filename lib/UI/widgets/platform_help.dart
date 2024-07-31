@@ -38,3 +38,23 @@ Future<void> getNowcoderPlatformHelp(BuildContext context) async {
         );
       });
 }
+
+Future<void> getLanqiaoPlatformHelp(BuildContext context) async {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('警告'),
+          titleTextStyle: TextStyle(
+              fontSize: 20.0, color: Colors.black, fontWeight: FontWeight.bold),
+          content: Text(
+            '实验性功能，访问很慢！\n只支持当前赛季题量，题量小于10不予显示\n'
+            '蓝桥云课个人界面，网址栏users/后即id',
+            style: TextStyle(
+              fontSize: 16.0,
+              height: 1.5,
+            ),
+          ),
+        );
+      });
+}
