@@ -139,26 +139,36 @@ class SolvedNumServices {
     if (response.statusCode != 200) {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
-    List<Future> futures = [];
-    for (int i = 1; i <= 400; i++) {
-      var url =
-          'https://www.lanqiao.cn/api/v2/user/prepare-match/problem-rank/?page_size=100&&page=$i';
-      futures.add(dio.get(url));
-    }
-    var responses = await Future.wait(futures);
-    for (var response in responses) {
-      if (response.statusCode == 200) {
+    List<Future<SolvedNum?>> futures = List.generate(
+      400,
+      (i) => Future(() async {
+        var url =
+            'https://www.lanqiao.cn/api/v2/user/prepare-match/problem-rank/?page_size=100&page=${i + 1}';
+        var response = await dio.get(url);
+
+        if (response.statusCode != 200) {
+          throw Exception("请求失败，状态码：${response.statusCode}");
+        }
+
         var list = response.data['data'];
         for (var j in list) {
+          print(j);
           if (j['user_id'].toString() == name) {
             return SolvedNum(name: name, solvedNum: j['problem_count']);
           }
         }
-      } else {
-        throw Exception("请求失败，状态码：${response.statusCode}");
+        return null;
+      }),
+    );
+
+    var data = await Future.wait(futures);
+    for (var result in data) {
+      if (result != null) {
+        return result;
       }
     }
-    return SolvedNum(name: name, solvedNum: 0);
+
+    throw Exception("查找失败");
   }
 }
 
