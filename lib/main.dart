@@ -3,8 +3,18 @@ import 'package:oj_helper/provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'ui/navigation_page.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  WindowOptions windowOptions = WindowOptions(
+    center: true,
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }

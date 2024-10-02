@@ -16,6 +16,8 @@ class RecentContestServices {
   final Dio dio = Dio();
   final int _nowSconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   int _queryEndSeconds = 7 * 24 * 60 * 60; //最晚时间
+  int midnightSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000 -
+      DateTime.now().hour * 3600;
 
   ///修改查询最晚时间
   void setDay(int day) {
@@ -26,9 +28,10 @@ class RecentContestServices {
   ///@return: 比赛过早返回2，比赛过晚返回1，其余返回0
   int _isIntime({int startTime = 0, int duration = 0}) {
     int endTime = startTime + duration;
-    if (startTime > _queryEndSeconds + _nowSconds || duration >= 24 * 60 * 60) {
+    if (startTime > _queryEndSeconds + midnightSeconds ||
+        duration >= 24 * 60 * 60) {
       return 1;
-    } else if (endTime < _nowSconds) {
+    } else if (endTime < midnightSeconds) {
       return 2;
     }
     return 0;
