@@ -20,7 +20,7 @@ dependencies:
   url_launcher: ^6.3.0
   flutter_localizations:
     sdk: flutter
-  flutter_local_notifications: ^17.2.1
+  window_manager: ^0.4.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

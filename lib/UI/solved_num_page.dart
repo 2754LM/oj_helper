@@ -21,7 +21,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'VJudge',
     'hdu',
     'poj',
-    // 'CodeChef',
+    '蓝桥云课'
   ];
   // 平台颜色
   Map<String, Color> _platforColor = {
@@ -33,7 +33,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'hdu': const Color.fromARGB(255, 150, 150, 150), // 中灰色
     'poj': const Color.fromARGB(255, 200, 200, 200), // 浅灰色
     '牛客': const Color.fromARGB(255, 255, 102, 0), // 橙色
-    'CodeChef': const Color.fromARGB(255, 255, 215, 0) //金黄色
+    '蓝桥云课': const Color.fromARGB(255, 255, 215, 0), //金黄色
   };
   // 平台简称
   Map<String, String> shortNmae = {
@@ -45,7 +45,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'hdu': 'HDU',
     'poj': 'POJ',
     '牛客': '牛客',
-    'CodeChef': 'cchef'
+    '蓝桥云课': '蓝桥'
   };
   Map<String, bool> _isLoading = {}; //存储每个平台是否正在查询
   Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
@@ -263,6 +263,13 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                       await getLeetcodePlatformHelp(context);
                     },
                     icon: const Icon(Icons.help),
+                  ),
+                if (platformName == '蓝桥云课')
+                  IconButton(
+                    onPressed: () async {
+                      await getLanqiaoPlatformHelp(context);
+                    },
+                    icon: const Icon(Icons.error),
                   )
                 else
                   Container(),
@@ -288,7 +295,9 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                   enabled: _isLoading[platformName] == false,
                   // 使用对应的控制器
                   decoration: InputDecoration(
-                    labelText: platformName == '牛客' ? 'id' : '用户名',
+                    labelText: (platformName == '牛客' || platformName == '蓝桥云课')
+                        ? 'id'
+                        : '用户名',
                     labelStyle: const TextStyle(color: Colors.grey),
                     floatingLabelStyle: const TextStyle(color: Colors.blue),
                     focusedBorder: UnderlineInputBorder(

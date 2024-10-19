@@ -585,7 +585,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                           fontWeight: FontWeight.bold,
                         )),
                     TextSpan(
-                      text: '$diffStr',
+                      text: diffStr,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: diffColor,
