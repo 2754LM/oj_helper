@@ -6,7 +6,7 @@ import 'package:oj_helper/provider.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'ui/navigation_page.dart';
+import 'UI/navigation_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/solved_num.dart';
-import 'package:oj_helper/ui/widgets/platform_help.dart';
+import 'package:oj_helper/UI/widgets/platform_help.dart';
 import 'package:oj_helper/utils/solved_utils.dart' show SolvedUtils;
 import 'package:shared_preferences/shared_preferences.dart';
 
