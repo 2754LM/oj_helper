@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/rating.dart';
-import 'package:oj_helper/UI/widgets/platform_help.dart';
+import 'package:oj_helper/ui/widgets/platform_help.dart';
 import 'package:oj_helper/utils/rating_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
