@@ -1,10 +1,10 @@
 <div align=center>
   <img width=200 src="android\app\src\main\res\mipmap-xhdpi\ic_launcher.png"  alt="图标"/>
 
-<div align=center>
 
 一款帮助你查询各大oj信息的应用。
 
+</div>
 
 [![banner](./doc/banner.png)](https://github.com/2754LM/oj_helper/releases/latest)
 
@@ -18,6 +18,10 @@
 点击右侧的Releases，获取最新的版本，根据你的系统下载对应的安装包即可
 
 **注意**，不是下载Source code，而是下载上方的zip和apk文件
+
+[<img src="https://f-droid.org/badge/get-it-on-zh-cn.png"
+    alt="Get it on F-Droid"
+    height="80">](https://f-droid.org/packages/com.example.oj_helper)
 
 如果觉得本项目对你有用的话，点点右上角的star喵
 
