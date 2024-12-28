@@ -23,7 +23,7 @@ class _ServicePageState extends State<ServicePage> {
         builder: (context, constraints) {
           // 计算每行的列数
           double width = constraints.maxWidth;
-          int crossAxisCount = (width / 150).floor(); // 每个按钮的宽度为150，计算显示的列数
+          int crossAxisCount = (width / 180).floor();
 
           return GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
