@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'rating_page.dart';
+import 'package:oj_helper/ui/favorites_page.dart';
+import 'package:oj_helper/ui/service_page.dart';
+import 'package:oj_helper/ui/setting_page.dart';
+
 import 'recent_contest_page.dart';
-import 'solved_num_page.dart';
-import 'favorites_page.dart';
 
 class NavigationPage extends StatefulWidget {
   @override
@@ -10,7 +11,6 @@ class NavigationPage extends StatefulWidget {
 }
 
 class _NavigationPageState extends State<NavigationPage> {
-  final updateUrl = 'https://api.github.com/2754LM/oj_helper/releases/latest';
   @override
   void initState() {
     super.initState();
@@ -22,8 +22,8 @@ class _NavigationPageState extends State<NavigationPage> {
   final List<Widget> _pages = [
     RecentContestPage(),
     FavoritesPage(),
-    RatingPage(),
-    SolvedNumPage(),
+    ServicePage(),
+    SettingPage(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -61,12 +61,12 @@ class _NavigationPageState extends State<NavigationPage> {
                         label: Text('收藏'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.trending_up),
-                        label: Text('分数'),
+                        icon: Icon(Icons.list),
+                        label: Text('功能'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.done),
-                        label: Text('题量'),
+                        icon: Icon(Icons.settings),
+                        label: Text('设置'),
                       ),
                     ],
                   ),
@@ -91,9 +91,9 @@ class _NavigationPageState extends State<NavigationPage> {
                       BottomNavigationBarItem(
                           icon: Icon(Icons.star), label: '收藏'),
                       BottomNavigationBarItem(
-                          icon: Icon(Icons.trending_up), label: '分数'),
+                          icon: Icon(Icons.list), label: '功能'),
                       BottomNavigationBarItem(
-                          icon: Icon(Icons.done), label: '题量'),
+                          icon: Icon(Icons.settings), label: '设置'),
                     ],
                     selectedIconTheme: IconThemeData(
                       color: Colors.blue,

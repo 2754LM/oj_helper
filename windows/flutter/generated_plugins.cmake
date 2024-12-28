@@ -3,7 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  screen_retriever
+  flutter_inappwebview_windows
+  screen_retriever_windows
   url_launcher_windows
   window_manager
 )
