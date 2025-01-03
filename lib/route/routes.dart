@@ -9,6 +9,8 @@ import 'package:oj_helper/ui/service_page.dart';
 import 'package:oj_helper/ui/setting_page.dart';
 import 'package:oj_helper/ui/solvednum_page.dart';
 
+import '../ui/cf_report_page.dart';
+
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -30,6 +32,8 @@ class Routes {
         return pageRoute(CcpcPage());
       case RoutePath.oier:
         return pageRoute(OierPage());
+      case RoutePath.cf_report:
+        return pageRoute(CfReportPage());
     }
     return pageRoute(Scaffold(
         body: Center(child: Text('No route defined for ${settings.name}'))));
@@ -54,4 +58,5 @@ class RoutePath {
   static const String star = '/star';
   static const String ccpc = '/ccpc';
   static const String oier = '/oier';
+  static const String cf_report = '/cf_report';
 }

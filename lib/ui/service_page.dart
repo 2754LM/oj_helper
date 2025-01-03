@@ -33,7 +33,7 @@ class _ServicePageState extends State<ServicePage> {
               childAspectRatio: 1, // 使按钮为正方形
             ),
             padding: const EdgeInsets.all(16.0),
-            itemCount: 4, // 按钮数量
+            itemCount: 5, // 按钮数量
             itemBuilder: (context, index) {
               switch (index) {
                 case 0:
@@ -70,6 +70,15 @@ class _ServicePageState extends State<ServicePage> {
                     'assets/images/oier.jpg',
                     () {
                       Navigator.pushNamed(context, RoutePath.oier);
+                    },
+                  );
+                case 4:
+                  return _buildSquareButton(
+                    context,
+                    'cf分析',
+                    'assets/images/report.png',
+                    () {
+                      Navigator.pushNamed(context, RoutePath.cf_report);
                     },
                   );
                 default:

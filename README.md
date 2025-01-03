@@ -43,9 +43,6 @@ https://github.com/2754LM/oj_helper/issues
 
 4：Rating分和题量界面Card添加功能：复制，删除，移动
 
-5：设置界面
-
-6：应用内更新
 ### 项目结构
 
 models 存放数据类型，ui 存放页面和控件，services 存放爬虫和数据基本处理，utils 存放处理数据的工具
