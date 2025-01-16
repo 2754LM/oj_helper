@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:intl/intl.dart';
-import '../models/contest.dart' show Contest;
 import 'package:html/parser.dart' show parse;
+import 'package:intl/intl.dart';
+
+import '../models/contest.dart' show Contest;
 
 class RecentContestServices {
   final _leetcodeUrl = "https://leetcode.cn/graphql";
@@ -191,7 +192,12 @@ class RecentContestServices {
 
   ///获取洛谷比赛
   Future<List<Contest>> getLuoguContests({bool isRated = true}) async {
-    Response response = await dio.get(_luoguUrl);
+    Options options = Options(
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    );
+    Response response = await dio.get(_luoguUrl, options: options);
     if (response.statusCode == 200) {
       List<Contest> contests = [];
       final contestList = response.data['currentData']['contests']['result'];
@@ -246,6 +252,6 @@ class RecentContestServices {
 }
 
 void main() async {
-  RecentContestServices recentContestServices = RecentContestServices();
-  final atc = await recentContestServices.getLanqiaoContests();
+  RecentContestServices r = RecentContestServices();
+  r.getLuoguContests();
 }
