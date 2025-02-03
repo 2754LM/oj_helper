@@ -90,8 +90,13 @@ class RatingService {
   ///获取洛谷的curRating和maxRating（近百场）
   Future<Rating> getLuoguRating({name = ''}) async {
     final baseUrl = 'https://www.luogu.com.cn/api/user/search?keyword=$name';
+    Options options = Options(
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    );
     int userId;
-    Response response = await dio.get(baseUrl);
+    Response response = await dio.get(baseUrl, options: options);
     if (response.statusCode == 200) {
       userId = response.data['users'][0]['uid'];
     } else {
@@ -99,7 +104,7 @@ class RatingService {
     }
     final url =
         'https://www.luogu.com.cn/api/rating/elo?user=$userId&page=1&limit=100';
-    response = await dio.get(url);
+    response = await dio.get(url, options: options);
     if (response.statusCode == 200) {
       final curRating = response.data['records']['result'][0]['rating'];
       int maxRating = 0;

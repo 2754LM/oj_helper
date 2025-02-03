@@ -71,12 +71,31 @@ class SolvedNumServices {
   }
 
   ///获取洛谷的解题数
-  //数据来源：https://github.com/Liu233w/acm-statistics
   Future<SolvedNum> getLuoguRating({name = ''}) async {
-    final url = 'https://ojhunt.com/api/crawlers/luogu/$name';
-    final response = await dio.get(url);
+    final url = 'https://www.luogu.com.cn/api/user/search?keyword=$name';
+    Options options = Options(
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    );
+    final response = await dio.get(url, options: options);
     if (response.statusCode == 200) {
-      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
+      print(response.data);
+      int userId = response.data['users'][0]['uid'];
+      final url = 'https://www.luogu.com.cn/user/$userId';
+      final res = await dio.get(url, options: options);
+      if (res.statusCode == 200) {
+        final text = res.data
+            .toString()
+            .split('passedProblemCount')[1]
+            .split('submittedProblemCount')[0];
+        String decodedString = Uri.decodeComponent(text);
+        decodedString = decodedString.substring(2, decodedString.length - 2);
+        final solvedNum = int.parse(decodedString);
+        return SolvedNum(name: name, solvedNum: solvedNum);
+      } else {
+        throw Exception("请求失败，状态码：${res.statusCode}");
+      }
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
@@ -174,6 +193,5 @@ class SolvedNumServices {
 
 void main() async {
   final services = SolvedNumServices();
-  final nowcoder = await services.getLanqiaoContests(name: '2328736');
-  print(nowcoder.solvedNum);
+  final nowcoder = await services.getLuoguRating(name: 'Mikoto_Shire');
 }
