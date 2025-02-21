@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:oj_helper/provider.dart';
+import 'package:oj_helper/route/routes.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
-
-import 'ui/navigation_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +44,8 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.light().copyWith(primary: Colors.blue),
         ),
-        home: NavigationPage(), // 使用 NavigationPage 作为根页面
+        onGenerateRoute: Routes.generateRoute,
+        initialRoute: RoutePath.home,
       ),
     );
   }

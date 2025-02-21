@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../services/sentence_services.dart';
+
 class RecentContestPage extends StatefulWidget {
   @override
   State<RecentContestPage> createState() => _RecentContestPageState();
@@ -24,6 +26,8 @@ class _RecentContestPageState extends State<RecentContestPage>
   int day = 7;
   // 加载状态
   bool isLoading = false;
+  final sentenceServices = SentenceServices();
+  Map<String, dynamic> sentence = {};
 
   ///获取近期比赛
   void _loadContests() async {
@@ -77,8 +81,33 @@ class _RecentContestPageState extends State<RecentContestPage>
     setState(() {});
   }
 
+  void _getSentences() async {
+    sentence = await sentenceServices.getSentences();
+  }
+
+  void _wait() {
+    //加载中警告
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('全速加载中，老大别急喵'),
+        titleTextStyle: TextStyle(
+          fontSize: 20,
+          color: Colors.black,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    _getSentences();
     super.build(context);
     return Scaffold(
       appBar: AppBar(
@@ -100,16 +129,35 @@ class _RecentContestPageState extends State<RecentContestPage>
             icon: Icon(Icons.search),
             color: Colors.blue,
             iconSize: 35,
-            onPressed: _loadContests, //加载比赛
+            onPressed: isLoading ? _wait : _loadContests, //加载比赛
           ),
         ],
       ),
       body: Stack(
         children: [
           isLoading // 显示加载动画
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.black,
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          sentence['content'] ?? '风落吴江雪，纷纷入酒杯。',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const CircularProgressIndicator(
+                        color: Colors.black,
+                      ),
+                    ],
                   ),
                 )
               : _buildBody(),
