@@ -8,7 +8,7 @@ class RatingService {
   ///获取codeforces的curRating,maxRating
   Future<Rating> getCodeforcesRating({name = ''}) async {
     final url =
-        "https://mirror.codeforces.com/api/user.info?handles=$name&checkHistoricHandles=false";
+        "https://codeforces.com/api/user.info?handles=$name&checkHistoricHandles=false";
     Response response = await dio.get(url);
     if (response.statusCode == 200) {
       final rating = response.data['result'][0]['rating'];

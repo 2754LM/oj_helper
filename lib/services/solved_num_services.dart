@@ -7,7 +7,7 @@ class SolvedNumServices {
 
   /// 获取codeforces的解题数
   Future<SolvedNum> getCodeforcesSolvedNum({name = ''}) async {
-    final url = 'https://mirror.codeforces.com/profile/$name';
+    final url = 'https://codeforces.com/profile/$name';
     final response = await dio.get(url);
     if (response.statusCode == 200) {
       final document = parse(response.data);

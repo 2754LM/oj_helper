@@ -7,8 +7,7 @@ import '../models/contest.dart' show Contest;
 class RecentContestServices {
   final _leetcodeUrl = "https://leetcode.cn/graphql";
   final _atcoderUrl = "https://atcoder.jp/contests/";
-  final _codeforcesUrl =
-      "https://mirror.codeforces.com/api/contest.list?gym=false";
+  final _codeforcesUrl = "https://codeforces.com/api/contest.list?gym=false";
   final _luoguUrl =
       "https://www.luogu.com.cn/contest/list?page=1&_contentOnly=1";
   final _lanqiaoUrl =
@@ -95,7 +94,7 @@ class RecentContestServices {
         if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
         if (_isIntime(startTime: startTime, duration: duration) == 2) break;
         contests.add(Contest.fromJson(contestList[i]['name'], startTime,
-            duration, 'Codeforces', 'https://mirror.codeforces.com/contests'));
+            duration, 'Codeforces', 'https://codeforces.com/contests'));
       }
       return contests;
     } else {
@@ -253,5 +252,5 @@ class RecentContestServices {
 
 void main() async {
   RecentContestServices r = RecentContestServices();
-  r.getLuoguContests();
+  r.getCodeforcesContests();
 }
