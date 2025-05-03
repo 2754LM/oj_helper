@@ -46,3 +46,5 @@ https://github.com/2754LM/oj_helper/issues
 ### 项目结构
 
 models 存放数据类型，ui 存放页面和控件，services 存放爬虫和数据基本处理，utils 存放处理数据的工具
+
+[![Star History Chart](https://api.star-history.com/svg?repos=2754LM/oj_helper&type=Date)](https://www.star-history.com/#2754LM/oj_helper&Date)
