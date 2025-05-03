@@ -1,0 +1,23 @@
+name: Build Manual
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+      - name: Install Fastforge
+        run: dart pub global activate fastforge
+      - name: Build
+        run: |
+          fastforge package --platform android --targets apk
+          fastforge package --platform windows --targets zip
+      - name: Upload Dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
