@@ -72,15 +72,15 @@ class _ServicePageState extends State<ServicePage> {
                       Navigator.pushNamed(context, RoutePath.oier);
                     },
                   );
-                case 4:
-                  return _buildSquareButton(
-                    context,
-                    'cf分析',
-                    'assets/images/report.png',
-                    () {
-                      Navigator.pushNamed(context, RoutePath.cf_report);
-                    },
-                  );
+                // case 4:
+                //   return _buildSquareButton(
+                //     context,
+                //     'cf分析',
+                //     'assets/images/report.png',
+                //     () {
+                //       Navigator.pushNamed(context, RoutePath.cf_report);
+                //     },
+                //   );
                 default:
                   return Container();
               }

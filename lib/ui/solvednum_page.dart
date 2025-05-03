@@ -301,11 +301,15 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                 child: TextFormField(
                   controller: _usernameControllers[platformName],
                   enabled: _isLoading[platformName] == false,
-                  // 使用对应的控制器
                   decoration: InputDecoration(
                     labelText: (platformName == '牛客' || platformName == '蓝桥云课')
                         ? 'id'
                         : '用户名',
+                    hintText: '多用户用;分隔',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
                     labelStyle: const TextStyle(color: Colors.grey),
                     floatingLabelStyle: const TextStyle(color: Colors.blue),
                     focusedBorder: UnderlineInputBorder(
@@ -329,7 +333,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                       _infoMessages[platformName] = '';
                     });
                     _saveUsername(platformName, text);
-                  }, // 保存用户名
+                  },
                 ),
               ),
               SizedBox(width: 20),
@@ -351,15 +355,14 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
             )
           else
             const SizedBox(),
-          //返回信息
           if (_infoMessages[platformName] != '')
             Text(
               _infoMessages[platformName]!,
               style: TextStyle(
                   fontSize: 16,
-                  color: _infoMessages[platformName] != '查询失败，请检查网络或用户名是否正确'
-                      ? Colors.green
-                      : Colors.red),
+                  color: _infoMessages[platformName]!.contains('查询失败')
+                      ? Colors.red
+                      : Colors.green),
               textAlign: TextAlign.center,
               maxLines: 2,
             )
@@ -368,32 +371,48 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     );
   }
 
-  // 查询SolvedNum函数
+  // 查询SolvedNum函数（支持多用户查询）
   void _querySolvedNum(String platformName, String username) async {
     if (username == '') {
       return;
     }
+
+    // 分割用户名（支持;分隔多用户）
+    List<String> usernames = username
+        .split(';')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
     setState(() {
       _isLoading[platformName] = true;
     });
-    SolvedNum? solvedNumResult;
+
+    int totalSolved = 0;
+    String infoMessage = '';
+
     try {
-      solvedNumResult = await SolvedUtils.getSolvedNum(
-          platformName: platformName, name: username);
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading[platformName] = false;
-          _infoMessages[platformName] = '查询失败，请检查网络或用户名是否正确';
-        });
+      for (String user in usernames) {
+        SolvedNum? solvedNumResult = await SolvedUtils.getSolvedNum(
+            platformName: platformName, name: user);
+        if (solvedNumResult != null) {
+          totalSolved += solvedNumResult.solvedNum;
+        }
       }
-      return;
+
+      // 根据用户数量显示不同信息
+      infoMessage = usernames.length > 1
+          ? '总解题数: $totalSolved (${usernames.length}个用户)'
+          : '已解决: $totalSolved';
+    } catch (e) {
+      infoMessage = '查询失败，请检查网络或用户名是否正确';
     }
+
     if (mounted) {
       setState(() {
         _isLoading[platformName] = false;
-        _platformSolvedNums[platformName] = solvedNumResult!.solvedNum;
-        _infoMessages[platformName] = '已解决：${solvedNumResult.solvedNum}';
+        _platformSolvedNums[platformName] = totalSolved;
+        _infoMessages[platformName] = infoMessage;
       });
     }
   }

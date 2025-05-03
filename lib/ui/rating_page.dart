@@ -53,17 +53,17 @@ class _RatingPageState extends State<RatingPage> {
     await prefs.setString(platformName, username);
   }
 
-  // 加载折线图(TODO)
-  Future<void> _loadLineChartData() async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('别急，没做完'),
-          );
-        });
-    return;
-  }
+  // // 加载折线图(TODO)
+  // Future<void> _loadLineChartData() async {
+  //   showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           title: Text('别急，没做完'),
+  //         );
+  //       });
+  //   return;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -84,14 +84,14 @@ class _RatingPageState extends State<RatingPage> {
           },
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.show_chart),
-            color: Colors.blue,
-            iconSize: 35,
-            onPressed: () async {
-              await _loadLineChartData();
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.show_chart),
+          //   color: Colors.blue,
+          //   iconSize: 35,
+          //   onPressed: () async {
+          //     await _loadLineChartData();
+          //   },
+          // ),
           IconButton(
             icon: Icon(Icons.search),
             color: Colors.blue,
