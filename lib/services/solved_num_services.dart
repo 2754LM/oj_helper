@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:oj_helper/models/solved_num.dart' show SolvedNum;
 import 'package:html/parser.dart' show parse;
+import 'package:oj_helper/models/solved_num.dart' show SolvedNum;
 
 class SolvedNumServices {
   final dio = Dio();
