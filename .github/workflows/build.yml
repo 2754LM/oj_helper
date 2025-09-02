@@ -3,30 +3,47 @@ name: Build Manual
 on:
   workflow_dispatch:
 
-
 jobs:
   build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Clean Pub Cache
+
+      # 第一步：安装 Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.36.0"
+          channel: "main"
+          cache: true
+          cache-key: flutter-packages
+
+      # 第二步：清理和安装依赖
+      - name: Clean and install dependencies
         run: |
           flutter clean
           flutter pub cache clean
-      - uses: subosito/flutter-action@v2
+          flutter pub get
+
+      - name: Verify Flutter version
+        run: flutter --version
+
       - name: Install Fastforge
         run: dart pub global activate fastforge
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: "zulu"
           java-version: 17
+
       - name: Build
         run: |
           fastforge package --platform android --targets apk
           fastforge package --platform windows --targets zip
+
       - name: Upload Dist
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist/*
+          path: dist/
