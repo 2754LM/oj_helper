@@ -161,13 +161,6 @@ class _SettingPageState extends State<SettingPage> {
             subtitle: const Text("https://github.com/2754LM/oj_helper"),
             onTap: () => launchUrlString("https://github.com/2754LM/oj_helper"),
           ),
-          ListTile(
-            leading: const Icon(Icons.chat),
-            title: const Text("QQ群"),
-            subtitle: const Text("947560153"),
-            onTap: () => launchUrlString(
-                "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=6wgGLJ_NmKQl7f9Ws6JAprbTwmG9Ouei&authKey=g7bXX%2Bn2dHlbecf%2B8QfGJ15IFVOmEdGTJuoLYfviLg7TZIsZCu45sngzZfL3KktN&noverify=0&group_code=947560153"),
-          ),
         ],
       ),
     );
