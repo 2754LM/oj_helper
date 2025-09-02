@@ -37,46 +37,52 @@ jobs:
           distribution: "zulu"
           java-version: 17
 
-      # 第三步：优化构建（替换原来的Build步骤）
+      # 第三步：优化构建（Windows PowerShell 兼容版本）
       - name: Build Optimized Android APK
         run: |
-          # 使用Flutter原生命令进行深度优化构建
-          flutter build apk --split-per-abi --release \
-            --obfuscate \
-            --split-debug-info=./split-debug-info \
-            --tree-shake-icons \
-            --shrink \
+          # Windows PowerShell 多行命令的正确写法
+          flutter build apk --split-per-abi --release `
+            --obfuscate `
+            --split-debug-info=./split-debug-info `
+            --tree-shake-icons `
+            --shrink `
             --dart-define=FLUTTER_BUILD_OPTIMIZATION=true
           
-          # 复制APK文件到dist目录
           mkdir -p dist/android
           cp build/app/outputs/flutter-apk/*.apk dist/android/
           
-          # 显示文件大小信息
           echo "=== 生成的APK文件大小 ==="
-          ls -la build/app/outputs/flutter-apk/ | grep "\.apk"
-          du -h build/app/outputs/flutter-apk/*.apk
+          dir build/app/outputs/flutter-apk/*.apk
+          foreach ($file in (Get-ChildItem build/app/outputs/flutter-apk/*.apk)) {
+            $size = [math]::Round(($file.Length / 1MB), 2)
+            Write-Output "$($file.Name): $size MB"
+          }
 
-      # 第四步：Windows构建（保持原样）
+      # 或者使用单行版本（更可靠）：
+      - name: Build Optimized Android APK (Single Line)
+        run: flutter build apk --split-per-abi --release --obfuscate --split-debug-info=./split-debug-info --tree-shake-icons --shrink --dart-define=FLUTTER_BUILD_OPTIMIZATION=true
+
+      # 第四步：复制文件
+      - name: Copy APK Files
+        run: |
+          mkdir -p dist/android
+          cp build/app/outputs/flutter-apk/*.apk dist/android/
+          echo "APK文件已复制到 dist/android/"
+
+      # 第五步：显示文件信息
+      - name: Show APK Info
+        run: |
+          echo "=== APK 文件信息 ==="
+          dir dist/android/
+          foreach ($file in (Get-ChildItem dist/android/*.apk)) {
+            $size = [math]::Round(($file.Length / 1MB), 2)
+            Write-Output "$($file.Name): $size MB"
+          }
+
+      # 第六步：Windows构建
       - name: Build Windows
         run: |
           fastforge package --platform windows --targets zip
-
-      # 第五步：APK分析（可选，用于诊断）
-      - name: Analyze APK Size
-        run: |
-          echo "=== APK组成分析 ==="
-          # 使用aapt工具分析APK内容（如果可用）
-          if command -v aapt &> /dev/null; then
-            for apk in dist/android/*.apk; do
-              echo "分析文件: $apk"
-              aapt dump badging "$apk" | grep "package:"
-              echo "---"
-            done
-          fi
-          
-          echo "各架构APK大小:"
-          du -h dist/android/*.apk | sort -hr
 
       - name: Upload Dist
         uses: actions/upload-artifact@v4
