@@ -37,49 +37,45 @@ jobs:
           distribution: "zulu"
           java-version: 17
 
-      # 第三步：优化构建（Windows PowerShell 兼容版本）
+      # 第三步：优化构建（单行版本最可靠）
       - name: Build Optimized Android APK
-        run: |
-          # Windows PowerShell 多行命令的正确写法
-          flutter build apk --split-per-abi --release `
-            --obfuscate `
-            --split-debug-info=./split-debug-info `
-            --tree-shake-icons `
-            --shrink `
-            --dart-define=FLUTTER_BUILD_OPTIMIZATION=true
-          
-          mkdir -p dist/android
-          cp build/app/outputs/flutter-apk/*.apk dist/android/
-          
-          echo "=== 生成的APK文件大小 ==="
-          dir build/app/outputs/flutter-apk/*.apk
-          foreach ($file in (Get-ChildItem build/app/outputs/flutter-apk/*.apk)) {
-            $size = [math]::Round(($file.Length / 1MB), 2)
-            Write-Output "$($file.Name): $size MB"
-          }
-
-      # 或者使用单行版本（更可靠）：
-      - name: Build Optimized Android APK (Single Line)
         run: flutter build apk --split-per-abi --release --obfuscate --split-debug-info=./split-debug-info --tree-shake-icons --shrink --dart-define=FLUTTER_BUILD_OPTIMIZATION=true
 
-      # 第四步：复制文件
+      # 第四步：创建目录并复制文件（PowerShell兼容）
+      - name: Prepare Dist Directory
+        run: |
+          # 确保目录存在（PowerShell方式）
+          if (!(Test-Path "dist/android")) {
+            New-Item -ItemType Directory -Path "dist/android" -Force
+          }
+          
+          # 清空目标目录（可选）
+          Remove-Item "dist/android/*" -Force -ErrorAction SilentlyContinue
+
+      # 第五步：复制APK文件
       - name: Copy APK Files
         run: |
-          mkdir -p dist/android
-          cp build/app/outputs/flutter-apk/*.apk dist/android/
-          echo "APK文件已复制到 dist/android/"
+          # 复制所有APK文件到dist目录
+          Copy-Item -Path "build/app/outputs/flutter-apk/*.apk" -Destination "dist/android/" -Force
+          Write-Output "APK文件已复制到 dist/android/"
 
-      # 第五步：显示文件信息
+      # 第六步：显示文件信息
       - name: Show APK Info
         run: |
-          echo "=== APK 文件信息 ==="
-          dir dist/android/
-          foreach ($file in (Get-ChildItem dist/android/*.apk)) {
+          Write-Output "=== APK 文件信息 ==="
+          $apkFiles = Get-ChildItem "dist/android/*.apk"
+          if ($apkFiles.Count -eq 0) {
+            Write-Output "未找到APK文件！"
+            Get-ChildItem "build/app/outputs/flutter-apk/" -Recurse
+            exit 1
+          }
+          
+          foreach ($file in $apkFiles) {
             $size = [math]::Round(($file.Length / 1MB), 2)
             Write-Output "$($file.Name): $size MB"
           }
 
-      # 第六步：Windows构建
+      # 第七步：Windows构建
       - name: Build Windows
         run: |
           fastforge package --platform windows --targets zip
