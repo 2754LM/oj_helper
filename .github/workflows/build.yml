@@ -37,16 +37,49 @@ jobs:
           distribution: "zulu"
           java-version: 17
 
-      - name: Build
+      # 第三步：优化构建（替换原来的Build步骤）
+      - name: Build Optimized Android APK
         run: |
-          fastforge package --platform android --targets apk --flutter-build-args="release"
+          # 使用Flutter原生命令进行深度优化构建
+          flutter build apk --split-per-abi --release \
+            --obfuscate \
+            --split-debug-info=./split-debug-info \
+            --tree-shake-icons \
+            --shrink \
+            --dart-define=FLUTTER_BUILD_OPTIMIZATION=true
+          
+          # 复制APK文件到dist目录
+          mkdir -p dist/android
+          cp build/app/outputs/flutter-apk/*.apk dist/android/
+          
+          # 显示文件大小信息
+          echo "=== 生成的APK文件大小 ==="
+          ls -la build/app/outputs/flutter-apk/ | grep "\.apk"
+          du -h build/app/outputs/flutter-apk/*.apk
+
+      # 第四步：Windows构建（保持原样）
+      - name: Build Windows
+        run: |
           fastforge package --platform windows --targets zip
+
+      # 第五步：APK分析（可选，用于诊断）
+      - name: Analyze APK Size
+        run: |
+          echo "=== APK组成分析 ==="
+          # 使用aapt工具分析APK内容（如果可用）
+          if command -v aapt &> /dev/null; then
+            for apk in dist/android/*.apk; do
+              echo "分析文件: $apk"
+              aapt dump badging "$apk" | grep "package:"
+              echo "---"
+            done
+          fi
+          
+          echo "各架构APK大小:"
+          du -h dist/android/*.apk | sort -hr
 
       - name: Upload Dist
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
-
-
-
