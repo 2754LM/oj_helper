@@ -39,7 +39,7 @@ jobs:
 
       - name: Build
         run: |
-          fastforge package --platform android --targets apk --flutter-build-args="split-per-abi,release,obfuscate"
+          fastforge package --platform android --targets apk --flutter-build-args="release"
           fastforge package --platform windows --targets zip
 
       - name: Upload Dist
@@ -47,5 +47,6 @@ jobs:
         with:
           name: dist
           path: dist/
+
 
 
