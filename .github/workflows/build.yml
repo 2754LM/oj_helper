@@ -9,6 +9,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Clean Pub Cache
+        run: |
+          flutter clean
+          flutter pub cache clean
       - uses: subosito/flutter-action@v2
       - name: Install Fastforge
         run: dart pub global activate fastforge
