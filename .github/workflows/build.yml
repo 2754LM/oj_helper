@@ -39,7 +39,7 @@ jobs:
 
       - name: Build
         run: |
-          fastforge package --platform android --targets apk
+          fastforge package --platform android --targets apk --split-per-abi
           fastforge package --platform windows --targets zip
 
       - name: Upload Dist
@@ -47,3 +47,4 @@ jobs:
         with:
           name: dist
           path: dist/
+
