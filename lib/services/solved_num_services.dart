@@ -160,8 +160,9 @@ class SolvedNumServices {
     }
     
     // Use sequential pagination instead of 400 concurrent requests
+    // Reduced to more reasonable limit to avoid excessive API calls
     const int pageSize = 100;
-    const int maxPages = 400;
+    const int maxPages = 100; // Reduced from 400 to 100 (max 10,000 users checked)
     
     for (int page = 1; page <= maxPages; page++) {
       var url =
