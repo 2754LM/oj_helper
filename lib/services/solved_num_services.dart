@@ -81,7 +81,6 @@ class SolvedNumServices {
     );
     final response = await dio.get(url, options: options);
     if (response.statusCode == 200) {
-      print(response.data);
       int userId = response.data['users'][0]['uid'];
       final url = 'https://www.luogu.com.cn/user/$userId';
       final res = await dio.get(url, options: options);

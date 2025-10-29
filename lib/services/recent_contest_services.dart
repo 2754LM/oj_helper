@@ -227,7 +227,6 @@ class RecentContestServices {
       for (var i = 0; i < response.data.length; i++) {
         final name = response.data[i]['name'];
         final link = "https://www.lanqiao.cn${response.data[i]['html_url']}";
-        print(link);
         //time格式如2024-06-29T19:00:00+08:00
         final time = response.data[i]['open_at'];
         DateFormat starttimeFormat = DateFormat('yyyy-MM-ddTHH:mm:ssZ');

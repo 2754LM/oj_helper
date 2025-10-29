@@ -2,19 +2,21 @@ import 'package:oj_helper/models/rating.dart' show Rating;
 import 'package:oj_helper/services/rating_services.dart' show RatingService;
 
 class RatingUtils {
+  // Reuse service instance instead of creating new one each time
+  static final RatingService _service = RatingService();
+  
   static Future<Rating> getRating({platformName = '', name = ''}) async {
-    RatingService rs = RatingService();
     switch (platformName) {
       case 'Codeforces':
-        return await rs.getCodeforcesRating(name: name);
+        return await _service.getCodeforcesRating(name: name);
       case 'AtCoder':
-        return await rs.getAtCoderRating(name: name);
+        return await _service.getAtCoderRating(name: name);
       case '力扣':
-        return (await rs.getLeetCodeRating(name: name)).last;
+        return (await _service.getLeetCodeRating(name: name)).last;
       case '牛客':
-        return await rs.getNowcoderRating(name: name);
+        return await _service.getNowcoderRating(name: name);
       case '洛谷':
-        return await rs.getLuoguRating(name: name);
+        return await _service.getLuoguRating(name: name);
       default:
         throw Exception('没有此平台: $platformName');
     }
@@ -22,7 +24,6 @@ class RatingUtils {
 
   static Future<List<Rating>> getRatingList(
       {platformName = '', name = ''}) async {
-    RatingService rs = RatingService();
-    return (await rs.getLeetCodeRating(name: name));
+    return (await _service.getLeetCodeRating(name: name));
   }
 }
