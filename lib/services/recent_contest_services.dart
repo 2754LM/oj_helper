@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:intl/intl.dart';
+import 'package:oj_helper/services/http_client.dart';
 
 import '../models/contest.dart' show Contest;
 
@@ -13,7 +14,7 @@ class RecentContestServices {
   final _lanqiaoUrl =
       "https://www.lanqiao.cn/api/v2/contests/?sort=opentime&paginate=0&status=not_finished&game_type_code=2";
   final _nowcoderUrl = "https://ac.nowcoder.com/acm/contest/vip-index";
-  final Dio dio = Dio();
+  final Dio dio = HttpClient.instance;
   final int _nowSconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   int _queryEndSeconds = 7 * 24 * 60 * 60; //最晚时间
   int midnightSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000 -

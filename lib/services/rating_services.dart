@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:oj_helper/models/rating.dart' show Rating;
 import 'package:html/parser.dart' show parse;
+import 'package:oj_helper/services/http_client.dart';
 
 class RatingService {
-  final Dio dio = Dio();
+  final Dio dio = HttpClient.instance;
 
   ///获取codeforces的curRating,maxRating
   Future<Rating> getCodeforcesRating({name = ''}) async {
@@ -72,11 +73,13 @@ class RatingService {
       int maxmRating = 0;
       for (var i in ratingList) {
         if (i['attended'] == false) continue;
-        maxmRating =
-            i['rating'] > maxmRating ? i['rating'].toInt() : maxmRating;
+        final currentRating = i['rating'].toInt();
+        if (currentRating > maxmRating) {
+          maxmRating = currentRating;
+        }
         ratingHistory.add(Rating(
             name: i['contest']['title'],
-            curRating: i['rating'].toInt(),
+            curRating: currentRating,
             maxRating: maxmRating,
             ranking: i['ranking'],
             time: i['contest']['startTime']));
@@ -106,11 +109,10 @@ class RatingService {
         'https://www.luogu.com.cn/api/rating/elo?user=$userId&page=1&limit=100';
     response = await dio.get(url, options: options);
     if (response.statusCode == 200) {
-      final curRating = response.data['records']['result'][0]['rating'];
-      int maxRating = 0;
-      for (var i in response.data['records']['result']) {
-        maxRating = i['rating'] > maxRating ? i['rating'] : maxRating;
-      }
+      final records = response.data['records']['result'] as List;
+      final curRating = records[0]['rating'];
+      // Use reduce for more efficient max calculation
+      final maxRating = records.map((e) => e['rating'] as int).reduce((a, b) => a > b ? a : b);
       return Rating(name: name, curRating: curRating, maxRating: maxRating);
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
@@ -122,14 +124,10 @@ class RatingService {
     final url = 'https://ac.nowcoder.com/acm/contest/rating-history?uid=$name';
     Response response = await dio.get(url);
     if (response.statusCode == 200) {
-      final rateHistory = response.data['data'];
+      final rateHistory = response.data['data'] as List;
       final curRating = rateHistory.last['rating'].toInt();
-      //获取rateHisory的最大rating
-      int maxRating = 0;
-      for (var i in rateHistory) {
-        maxRating =
-            i['rating'].toInt() > maxRating ? i['rating'].toInt() : maxRating;
-      }
+      // Use reduce for more efficient max calculation
+      final maxRating = rateHistory.map((e) => e['rating'].toInt()).reduce((a, b) => a > b ? a : b);
       return Rating(name: name, curRating: curRating, maxRating: maxRating);
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");

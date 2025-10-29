@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:oj_helper/models/contest.dart' show Contest;
 import 'package:oj_helper/provider.dart';
@@ -21,7 +20,6 @@ class _RecentContestPageState extends State<RecentContestPage>
   bool get wantKeepAlive => true;
   final platForms = ['Codeforces', 'AtCoder', '洛谷', '蓝桥云课', '力扣', '牛客'];
   // 按日期分类的比赛列表，长度为7
-  Dio dio = Dio();
   // 查询天数，默认7天
   int day = 7;
   // 加载状态

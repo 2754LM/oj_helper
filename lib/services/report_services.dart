@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:oj_helper/services/http_client.dart';
 
 class ReportServices {
-  final dio = Dio();
+  final dio = HttpClient.instance;
   Future<List<Map<String, dynamic>>> fetchCodeforcesData(String handle) async {
+    // Codeforces API has a maximum count limit, using a reasonable value
     final codeforcesUrl =
-        'https://codeforces.com/api/user.status?handle=$handle&from=1&count=1000000000';
+        'https://codeforces.com/api/user.status?handle=$handle&from=1&count=10000';
     final response = await dio.get(codeforcesUrl);
     if (response.statusCode != 200 || response.data['status'] != 'OK') {
       throw Exception('Failed to fetch data: ${response.data['comment']}');

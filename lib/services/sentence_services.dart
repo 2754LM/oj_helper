@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:oj_helper/services/http_client.dart';
 
 class SentenceServices {
-  final Dio dio = Dio();
+  final Dio dio = HttpClient.instance;
   Future<Map<String, dynamic>> getSentences() async {
     final url = 'https://v1.jinrishici.com/all.json';
     final response = await dio.get(url);

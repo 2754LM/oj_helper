@@ -9,26 +9,40 @@ class ContestUtils {
       {int day = 7, ContestProvider? contestProvider}) async {
     RecentContestServices rC = RecentContestServices();
     rC.setDay(day);
-    List<Contest> recentContestsList = [];
+    
     Map<String, bool>? selectPlatforms = contestProvider?.selectedPlatforms;
+    
+    // Create a list of futures for parallel execution
+    List<Future<List<Contest>>> futures = [];
+    
     if (selectPlatforms?['力扣'] == true) {
-      recentContestsList.addAll(await rC.getLeetcodeContests());
+      futures.add(rC.getLeetcodeContests());
     }
     if (selectPlatforms?['Codeforces'] == true) {
-      recentContestsList.addAll(await rC.getCodeforcesContests());
+      futures.add(rC.getCodeforcesContests());
     }
     if (selectPlatforms?['牛客'] == true) {
-      recentContestsList.addAll(await rC.getNowcoderContests());
+      futures.add(rC.getNowcoderContests());
     }
     if (selectPlatforms?['AtCoder'] == true) {
-      recentContestsList.addAll(await rC.getAtCoderContests());
+      futures.add(rC.getAtCoderContests());
     }
     if (selectPlatforms?['洛谷'] == true) {
-      recentContestsList.addAll(await rC.getLuoguContests());
+      futures.add(rC.getLuoguContests());
     }
     if (selectPlatforms?['蓝桥云课'] == true) {
-      recentContestsList.addAll(await rC.getLanqiaoContests());
+      futures.add(rC.getLanqiaoContests());
     }
+    
+    // Execute all requests in parallel
+    List<List<Contest>> results = await Future.wait(futures);
+    
+    // Flatten the results
+    List<Contest> recentContestsList = [];
+    for (var contestList in results) {
+      recentContestsList.addAll(contestList);
+    }
+    
     // 开始时间排序
     recentContestsList.sort((a, b) => a.startTime.compareTo(b.startTime));
     //按照开始的日期分组
