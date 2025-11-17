@@ -189,9 +189,30 @@ class SolvedNumServices {
 
     throw Exception("查找失败");
   }
+
+
+  //获取QOJ解题数
+  Future<SolvedNum> getQOJRating({name = ''}) async {
+    final url = 'https://qoj.ac/user/profile/$name';
+    final response = await dio.get(url);
+    if (response.statusCode != 200) {
+      throw Exception("请求失败，状态码：${response.statusCode}");
+    }
+    final htmlContent = response.data as String;
+    final acceptedPattern = RegExp(r'Accepted problems：(\d+) problems');
+    final acceptedMatch = acceptedPattern.firstMatch(htmlContent);
+    if (acceptedMatch == null) {
+      throw Exception('Failed to parse accepted problems count');
+    }
+    final acceptedCount = int.parse(acceptedMatch.group(1)!);
+    return SolvedNum(
+      name: name,
+      solvedNum: acceptedCount,
+    );
+  }
 }
 
 void main() async {
   final services = SolvedNumServices();
-  final nowcoder = await services.getLuoguRating(name: 'Mikoto_Shire');
+  final nowcoder = await services.getQOJRating(name: 'kano07');
 }
