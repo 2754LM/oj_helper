@@ -6,16 +6,12 @@ class SolvedNumServices {
   final dio = Dio();
 
   /// 获取codeforces的解题数
+  ///   //数据来源：https://github.com/Liu233w/acm-statistics
   Future<SolvedNum> getCodeforcesSolvedNum({name = ''}) async {
-    final url = 'https://codeforces.com/profile/$name';
+    final url = 'https://ojhunt.com/api/crawlers/codeforces/$name';
     final response = await dio.get(url);
     if (response.statusCode == 200) {
-      final document = parse(response.data);
-      final solvedNum = int.parse(document
-          .getElementsByClassName('_UserActivityFrame_counterValue')[0]
-          .text
-          .split(' ')[0]);
-      return SolvedNum(name: name, solvedNum: solvedNum);
+      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
@@ -214,5 +210,6 @@ class SolvedNumServices {
 
 void main() async {
   final services = SolvedNumServices();
-  final nowcoder = await services.getQOJRating(name: 'kano07');
+  final nowcoder = await services.getCodeforcesSolvedNum(name: 'kano07');
+  print('Codeforces solved num: ${nowcoder.solvedNum}');
 }
