@@ -19,11 +19,18 @@ jobs:
           cache-key: flutter-packages
 
       # 第二步：清理和安装依赖
-      - name: Clean and install dependencies
+      - name: Force version update
         run: |
+          # 清理所有可能的缓存
           flutter clean
-          flutter pub cache clean
+          Remove-Item -Recurse -Force build/ -ErrorAction SilentlyContinue
+          flutter pub cache repair
           flutter pub get
+          
+          # 验证版本
+          echo "配置的版本号："
+          cat pubspec.yaml | grep "version:"
+
 
       - name: Verify Flutter version
         run: flutter --version
