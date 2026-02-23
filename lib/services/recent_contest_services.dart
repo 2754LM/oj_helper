@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:intl/intl.dart';
@@ -60,7 +62,7 @@ class RecentContestServices {
       final contestList = response.data["data"]["contestUpcomingContests"];
       List<Contest> contests = [];
       //力扣的比赛分部比较散乱，最近两场的代码是在一起的，所以只取前两场
-      for (var i = 0; i < 2; i++) {
+      for (var i = 0; i < min(2, contestList.length); i++) {
         //解析信息
         final name = contestList[i]['title'];
         final startTime = contestList[i]['startTime'];
@@ -159,7 +161,7 @@ class RecentContestServices {
         final link =
             "https://atcoder.jp${upComingContests[i].getElementsByTagName("a")[1].attributes['href']!}";
         final name =
-            title.contains('（') ? title.split('（')[1].split('）')[0] : title;
+        title.contains('（') ? title.split('（')[1].split('）')[0] : title;
         final time =
             upComingContests[i].getElementsByClassName("fixtime-full")[0].text;
         final duration = upComingContests[i]
@@ -233,8 +235,8 @@ class RecentContestServices {
         final startTime =
             starttimeFormat.parse(time).millisecondsSinceEpoch ~/ 1000;
         final endTime = starttimeFormat
-                .parse(response.data[i]['end_at'])
-                .millisecondsSinceEpoch ~/
+            .parse(response.data[i]['end_at'])
+            .millisecondsSinceEpoch ~/
             1000;
         final duration = endTime - startTime;
         //判断时间范围
@@ -252,5 +254,5 @@ class RecentContestServices {
 
 void main() async {
   RecentContestServices r = RecentContestServices();
-  r.getCodeforcesContests();
+  r.getLeetcodeContests();
 }
