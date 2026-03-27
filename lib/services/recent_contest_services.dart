@@ -193,31 +193,36 @@ class RecentContestServices {
 
   ///获取洛谷比赛
   Future<List<Contest>> getLuoguContests({bool isRated = true}) async {
-    Options options = Options(
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+    final response = await dio.get(
+      'https://www.luogu.com.cn/contest/list?_contentOnly=1',
+      options: Options(headers: {
+        'x-lentille-request': 'content-only',
+        'x-requested-with': 'XMLHttpRequest',
+      }),
     );
-    Response response = await dio.get(_luoguUrl, options: options);
-    if (response.statusCode == 200) {
-      List<Contest> contests = [];
-      final contestList = response.data['currentData']['contests']['result'];
-      for (var i = 0; i < contestList.length; i++) {
-        if (contestList[i]['rated'] == false && isRated == true) continue;
-        final name = contestList[i]['name'];
-        final link = "https://www.luogu.com.cn/contest/${contestList[i]['id']}";
-        final startTime = contestList[i]['startTime'];
-        final duration = contestList[i]['endTime'] - startTime;
-        //判断时间范围
-        if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
-        if (_isIntime(startTime: startTime, duration: duration) == 2) break;
-        //添加元素
-        contests.add(Contest.fromJson(name, startTime, duration, '洛谷', link));
-      }
-      return contests;
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
+    if (response.statusCode != 200) throw Exception('请求失败');
+    final data = response.data['data']['contests']['result'] ?? [];
+    final contests = <Contest>[];
+    for (final item in data) {
+      if (item == null) continue;
+      if (isRated && item['rated'] == 0) continue;
+
+      final startTime = item['startTime'] as int;
+      final duration = (item['endTime'] as int) - startTime;
+
+      if (_isIntime(startTime: startTime, duration: duration) == 1) continue;
+      if (_isIntime(startTime: startTime, duration: duration) == 2) break;
+
+      contests.add(Contest.fromJson(
+        item['name'],
+        startTime,
+        duration,
+        '洛谷',
+        'https://www.luogu.com.cn/contest/${item['id']}',
+      ));
     }
+
+    return contests;
   }
 
   ///获取蓝桥杯比赛
@@ -254,5 +259,5 @@ class RecentContestServices {
 
 void main() async {
   RecentContestServices r = RecentContestServices();
-  r.getLeetcodeContests();
+  r.getLuoguContests();
 }
