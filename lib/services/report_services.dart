@@ -1,7 +1,7 @@
-import 'package:dio/dio.dart';
+import 'package:oj_helper/services/api_service.dart';
 
 class ReportServices {
-  final dio = Dio();
+  final dio = ApiService.dio;
   Future<List<Map<String, dynamic>>> fetchCodeforcesData(String handle) async {
     final codeforcesUrl =
         'https://codeforces.com/api/user.status?handle=$handle&from=1&count=1000000000';

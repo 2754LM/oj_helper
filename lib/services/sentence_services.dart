@@ -1,7 +1,7 @@
-import 'package:dio/dio.dart';
+import 'package:oj_helper/services/api_service.dart';
 
 class SentenceServices {
-  final Dio dio = Dio();
+  final dio = ApiService.dio;
   Future<Map<String, dynamic>> getSentences() async {
     final url = 'https://v1.jinrishici.com/all.json';
     final response = await dio.get(url);

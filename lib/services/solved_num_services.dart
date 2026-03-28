@@ -1,24 +1,23 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:oj_helper/models/solved_num.dart' show SolvedNum;
+import 'package:oj_helper/services/api_service.dart';
 
 class SolvedNumServices {
-  final dio = Dio();
+  final Dio dio = ApiService.dio;
 
   /// 获取codeforces的解题数
-  ///   //数据来源：https://github.com/Liu233w/acm-statistics
-  Future<SolvedNum> getCodeforcesSolvedNum({name = ''}) async {
+  Future<SolvedNum> getCodeforcesSolvedNum({String name = ''}) async {
     final url = 'https://ojhunt.com/api/crawlers/codeforces/$name';
-    final response = await dio.get(url);
-    if (response.statusCode == 200) {
-      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
+    return ApiService.safeRequest<Map<String, dynamic>>(() => dio.get(url))
+        .then((data) {
+      return SolvedNum(name: name, solvedNum: data['data']['solved']);
+    });
   }
 
   ///获取力扣的解题数
-  Future<SolvedNum> getLeetCodeRating({name = ''}) async {
+  Future<SolvedNum> getLeetCodeRating({String name = ''}) async {
     const url = 'https://leetcode.cn/graphql/';
     final data = {
       "query": """
@@ -34,182 +33,117 @@ class SolvedNumServices {
       "variables": {"userSlug": name},
       "operationName": "userProfileUserQuestionProgressV2"
     };
-    Response response = await dio.post(url, data: data);
-    if (response.statusCode == 200) {
-      final infor = response.data['data']['userProfileUserQuestionProgressV2']
+    return ApiService.safeRequest<Map<String, dynamic>>(
+        () => dio.post(url, data: data)).then((res) {
+      final info = res['data']['userProfileUserQuestionProgressV2']
           ['numAcceptedQuestions'];
-      final easySolvedNum = infor[0]['count'];
-      final mediumSolvedNum = infor[1]['count'];
-      final hardSolvedNum = infor[2]['count'];
-      final totalSolvedNum = easySolvedNum + mediumSolvedNum + hardSolvedNum;
+      final totalSolvedNum =
+          info.fold<int>(0, (sum, item) => sum + (item['count'] as int));
       return SolvedNum(name: name, solvedNum: totalSolvedNum);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
+    });
   }
 
   ///获取vjudge的解题数
-  Future<SolvedNum> getVJudgeRating({name = ''}) async {
-    final url = 'https://vjudge.net/user/$name';
-    final response = await dio.get(url);
-    if (response.statusCode == 200) {
-      final document = parse(response.data);
-      final solvedNum = int.parse(document
-          .getElementsByClassName('table table-reflow problem-solve')[0]
-          .getElementsByTagName('tbody')[0]
-          .getElementsByTagName('tr')[4]
-          .getElementsByTagName('a')[0]
-          .text);
-      return SolvedNum(name: name, solvedNum: solvedNum);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
+  Future<SolvedNum> getVJudgeRating({String name = ''}) async {
+    final url = 'https://vjudge.net/user/solveDetail/$name';
+    return ApiService.safeRequest<Map<String, dynamic>>(() => dio.get(url))
+        .then((data) {
+      final acRecords = data['acRecords'] as Map<String, dynamic>;
+      int total = 0;
+      acRecords.forEach((key, value) {
+        total += (value as List).length;
+      });
+      return SolvedNum(name: name, solvedNum: total);
+    });
   }
 
   ///获取洛谷的解题数
-  Future<SolvedNum> getLuoguRating({name = ''}) async {
-    final url = 'https://www.luogu.com.cn/api/user/search?keyword=$name';
-    Options options = Options(
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    );
-    final response = await dio.get(url, options: options);
-    if (response.statusCode == 200) {
-      print(response.data);
-      int userId = response.data['users'][0]['uid'];
-      final url = 'https://www.luogu.com.cn/user/$userId';
-      final res = await dio.get(url, options: options);
-      if (res.statusCode == 200) {
-        final text = res.data
-            .toString()
-            .split('passedProblemCount')[1]
-            .split('submittedProblemCount')[0];
-        String decodedString = Uri.decodeComponent(text);
-        decodedString = decodedString.substring(2, decodedString.length - 2);
-        final solvedNum = int.parse(decodedString);
-        return SolvedNum(name: name, solvedNum: solvedNum);
-      } else {
-        throw Exception("请求失败，状态码：${res.statusCode}");
-      }
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
+  Future<SolvedNum> getLuoguRating({String name = ''}) async {
+    final searchUrl = 'https://www.luogu.com.cn/api/user/search?keyword=$name';
+    final options = Options(headers: {'X-Requested-With': 'XMLHttpRequest'});
+
+    final searchData = await ApiService.safeRequest<Map<String, dynamic>>(
+        () => dio.get(searchUrl, options: options));
+    if (searchData['users'] == null || searchData['users'].isEmpty) {
+      throw Exception('未找到用户: $name');
     }
+    final userId = searchData['users'][0]['uid'];
+
+    final userUrl = 'https://www.luogu.com.cn/user/$userId';
+    // 洛谷的页面数据通常包含在 _feInjection 中，或者直接在 HTML 里能搜到 passedProblemCount
+    return ApiService.safeRequest<String>(
+        () => dio.get(userUrl, options: options)).then((res) {
+      final match = RegExp(r'"passedProblemCount"\s*:\s*(\d+)').firstMatch(res);
+      if (match != null) {
+        return SolvedNum(name: name, solvedNum: int.parse(match.group(1)!));
+      } else {
+        // 备选方案：尝试从 _feInjection 解析
+        try {
+          if (res.contains('window._feInjection =')) {
+            final start = res.indexOf('window._feInjection =') +
+                'window._feInjection ='.length;
+            final end = res.indexOf(';', start);
+            final jsonStr = res.substring(start, end).trim();
+            final data = json.decode(jsonStr);
+            final solved = data['currentData']['user']['passedProblemCount'];
+            if (solved != null) {
+              return SolvedNum(name: name, solvedNum: solved);
+            }
+          }
+        } catch (_) {}
+        throw Exception('解析洛谷通过题目数失败');
+      }
+    });
   }
 
   ///获取atcoder的解题数
-  //数据来源：https://github.com/kenkoooo/AtCoderProblems
-  Future<SolvedNum> getAtCoderRating({name = ''}) async {
+  Future<SolvedNum> getAtCoderRating({String name = ''}) async {
     final url =
         'https://kenkoooo.com/atcoder/atcoder-api/v3/user/ac_rank?user=$name';
-    final response = await dio.get(url);
-    if (response.statusCode == 200) {
-      final solvedNum = response.data['count'];
-      return SolvedNum(name: name, solvedNum: solvedNum);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
+    return ApiService.safeRequest<Map<String, dynamic>>(() => dio.get(url))
+        .then((data) {
+      return SolvedNum(name: name, solvedNum: data['count']);
+    });
   }
 
   ///获取hdu的解题数
-  //数据来源：https://github.com/Liu233w/acm-statistics
-  Future<SolvedNum> getHduRating({name = ''}) async {
+  Future<SolvedNum> getHduRating({String name = ''}) async {
     final url = 'https://ojhunt.com/api/crawlers/hdu/$name';
-    final response = await dio.get(url);
-    if (response.statusCode == 200) {
-      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
+    return ApiService.safeRequest<Map<String, dynamic>>(() => dio.get(url))
+        .then((data) {
+      return SolvedNum(name: name, solvedNum: data['data']['solved']);
+    });
   }
 
   ///获取poj的解题数
-  //数据来源：https://github.com/Liu233w/acm-statistics
-  Future<SolvedNum> getPOJRating({name = ''}) async {
+  Future<SolvedNum> getPOJRating({String name = ''}) async {
     final url = 'https://ojhunt.com/api/crawlers/poj/$name';
-    final response = await dio.get(url);
-    if (response.statusCode == 200) {
-      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
+    return ApiService.safeRequest<Map<String, dynamic>>(() => dio.get(url))
+        .then((data) {
+      return SolvedNum(name: name, solvedNum: data['data']['solved']);
+    });
   }
 
-  //获取牛客网的解题数
-  //数据来源：https://github.com/Liu233w/acm-statistics
-  Future<SolvedNum> getNowcoderRating({name = ''}) async {
+  ///获取牛客网的解题数
+  Future<SolvedNum> getNowcoderRating({String name = ''}) async {
     final url = 'https://ojhunt.com/api/crawlers/nowcoder/$name';
-    final response = await dio.get(url);
-    if (response.statusCode == 200) {
-      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
+    return ApiService.safeRequest<Map<String, dynamic>>(() => dio.get(url))
+        .then((data) {
+      return SolvedNum(name: name, solvedNum: data['data']['solved']);
+    });
   }
 
-  //获取蓝桥云课解题数(TODO)
-  Future<SolvedNum> getLanqiaoContests({String name = ''}) async {
-    var testurl = 'https://www.lanqiao.cn/users/$name/';
-    final response = await dio.get(testurl);
-    if (response.statusCode != 200) {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
-    List<Future<SolvedNum?>> futures = List.generate(
-      400,
-      (i) => Future(() async {
-        var url =
-            'https://www.lanqiao.cn/api/v2/user/prepare-match/problem-rank/?page_size=100&page=${i + 1}';
-        var response = await dio.get(url);
-
-        if (response.statusCode != 200) {
-          throw Exception("请求失败，状态码：${response.statusCode}");
-        }
-
-        var list = response.data['data'];
-        for (var j in list) {
-          print(j);
-          if (j['user_id'].toString() == name) {
-            return SolvedNum(name: name, solvedNum: j['problem_count']);
-          }
-        }
-        return null;
-      }),
-    );
-
-    var data = await Future.wait(futures);
-    for (var result in data) {
-      if (result != null) {
-        return result;
-      }
-    }
-
-    throw Exception("查找失败");
-  }
-
-
-  //获取QOJ解题数
-  Future<SolvedNum> getQOJRating({name = ''}) async {
+  ///获取QOJ解题数
+  Future<SolvedNum> getQOJRating({String name = ''}) async {
     final url = 'https://qoj.ac/user/profile/$name';
-    final response = await dio.get(url);
-    if (response.statusCode != 200) {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
-    final htmlContent = response.data as String;
-    final acceptedPattern = RegExp(r'Accepted problems：(\d+) problems');
-    final acceptedMatch = acceptedPattern.firstMatch(htmlContent);
-    if (acceptedMatch == null) {
-      throw Exception('Failed to parse accepted problems count');
-    }
-    final acceptedCount = int.parse(acceptedMatch.group(1)!);
-    return SolvedNum(
-      name: name,
-      solvedNum: acceptedCount,
-    );
+    return ApiService.safeRequest<String>(() => dio.get(url)).then((data) {
+      final acceptedPattern = RegExp(r'Accepted problems：(\d+) problems');
+      final acceptedMatch = acceptedPattern.firstMatch(data);
+      if (acceptedMatch == null) {
+        throw Exception('Failed to parse accepted problems count');
+      }
+      return SolvedNum(
+          name: name, solvedNum: int.parse(acceptedMatch.group(1)!));
+    });
   }
-}
-
-void main() async {
-  final services = SolvedNumServices();
-  final nowcoder = await services.getCodeforcesSolvedNum(name: 'kano07');
-  print('Codeforces solved num: ${nowcoder.solvedNum}');
 }

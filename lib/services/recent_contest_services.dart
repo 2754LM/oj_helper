@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 
 import '../models/contest.dart' show Contest;
 
+import 'package:oj_helper/services/api_service.dart';
+
 class RecentContestServices {
   final _leetcodeUrl = "https://leetcode.cn/graphql";
   final _atcoderUrl = "https://atcoder.jp/contests/";
@@ -15,7 +17,7 @@ class RecentContestServices {
   final _lanqiaoUrl =
       "https://www.lanqiao.cn/api/v2/contests/?sort=opentime&paginate=0&status=not_finished&game_type_code=2";
   final _nowcoderUrl = "https://ac.nowcoder.com/acm/contest/vip-index";
-  final Dio dio = Dio();
+  final Dio dio = ApiService.dio;
   final int _nowSconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   int _queryEndSeconds = 7 * 24 * 60 * 60; //最晚时间
   int midnightSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000 -
@@ -161,7 +163,7 @@ class RecentContestServices {
         final link =
             "https://atcoder.jp${upComingContests[i].getElementsByTagName("a")[1].attributes['href']!}";
         final name =
-        title.contains('（') ? title.split('（')[1].split('）')[0] : title;
+            title.contains('（') ? title.split('（')[1].split('）')[0] : title;
         final time =
             upComingContests[i].getElementsByClassName("fixtime-full")[0].text;
         final duration = upComingContests[i]
@@ -240,8 +242,8 @@ class RecentContestServices {
         final startTime =
             starttimeFormat.parse(time).millisecondsSinceEpoch ~/ 1000;
         final endTime = starttimeFormat
-            .parse(response.data[i]['end_at'])
-            .millisecondsSinceEpoch ~/
+                .parse(response.data[i]['end_at'])
+                .millisecondsSinceEpoch ~/
             1000;
         final duration = endTime - startTime;
         //判断时间范围
@@ -255,9 +257,4 @@ class RecentContestServices {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
   }
-}
-
-void main() async {
-  RecentContestServices r = RecentContestServices();
-  r.getLuoguContests();
 }

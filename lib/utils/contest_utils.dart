@@ -1,6 +1,6 @@
 import 'dart:core';
 import 'package:intl/intl.dart';
-import 'package:oj_helper/provider.dart';
+import 'package:oj_helper/providers/contest_provider.dart';
 import 'package:oj_helper/services/recent_contest_services.dart';
 import 'package:oj_helper/models/contest.dart' show Contest;
 

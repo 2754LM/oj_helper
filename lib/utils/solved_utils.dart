@@ -3,31 +3,31 @@ import 'package:oj_helper/services/solved_num_services.dart'
     show SolvedNumServices;
 
 class SolvedUtils {
-  static Future<SolvedNum> getSolvedNum({platformName = '', name = ''}) async {
-    SolvedNumServices rs = SolvedNumServices();
+  static final SolvedNumServices _rs = SolvedNumServices();
+
+  static Future<SolvedNum> getSolvedNum(
+      {String platformName = '', String name = ''}) async {
     switch (platformName) {
       case 'Codeforces':
-        return await rs.getCodeforcesSolvedNum(name: name);
+        return await _rs.getCodeforcesSolvedNum(name: name);
       case 'AtCoder':
-        return await rs.getAtCoderRating(name: name);
+        return await _rs.getAtCoderRating(name: name);
       case '力扣':
-        return await rs.getLeetCodeRating(name: name);
+        return await _rs.getLeetCodeRating(name: name);
       case '洛谷':
-        return await rs.getLuoguRating(name: name);
+        return await _rs.getLuoguRating(name: name);
       case 'VJudge':
-        return await rs.getVJudgeRating(name: name);
+        return await _rs.getVJudgeRating(name: name);
       case 'hdu':
-        return await rs.getHduRating(name: name);
+        return await _rs.getHduRating(name: name);
       case 'poj':
-        return await rs.getPOJRating(name: name);
+        return await _rs.getPOJRating(name: name);
       case '牛客':
-        return await rs.getNowcoderRating(name: name);
-      case '蓝桥云课':
-        return await rs.getLanqiaoContests(name: name);
+        return await _rs.getNowcoderRating(name: name);
       case 'QOJ':
-        return await rs.getQOJRating(name: name);
+        return await _rs.getQOJRating(name: name);
       default:
-        throw Exception('Platform not supported');
+        throw Exception('Platform not supported: $platformName');
     }
   }
 }
