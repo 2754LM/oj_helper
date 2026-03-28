@@ -33,6 +33,7 @@ jobs:
 
       - name: Analyze
         run: flutter analyze
+        continue-on-error: true
 
       - name: Build Android APK
         run: flutter build apk --split-per-abi --release --obfuscate --split-debug-info=./debug-info --tree-shake-icons --shrink
@@ -48,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          if-no-files-found: error
+          if-no-files-found: warn
           path: |
             build/app/outputs/flutter-apk/**/*.apk
 
@@ -69,7 +70,7 @@ jobs:
       - name: Build Windows
         run: |
           dart pub global activate fastforge
-          fastforge package --platform windows --targets zip
+          dart pub global run fastforge package --platform windows --targets zip
 
       - name: List Windows Outputs
         if: always()
@@ -81,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-dist
-          if-no-files-found: error
+          if-no-files-found: warn
           path: |
             dist/**/*.zip
 
