@@ -2,14 +2,17 @@ name: Build and Release
 
 on:
   push:
-    branches: [ '**' ]
+    branches: ['**']
   pull_request:
-    branches: [ '**' ]
+    branches: ['**']
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
-  build:
-    runs-on: windows-latest
+  android:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -28,19 +31,57 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Analyze
+        run: flutter analyze
+
       - name: Build Android APK
         run: flutter build apk --split-per-abi --release --obfuscate --split-debug-info=./debug-info --tree-shake-icons --shrink
+
+      - name: List Android Outputs
+        if: always()
+        run: |
+          ls -la build/app/outputs/flutter-apk || true
+          find build/app/outputs/flutter-apk -maxdepth 2 -type f -name "*.apk" -print || true
+
+      - name: Upload Android Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          if-no-files-found: error
+          path: |
+            build/app/outputs/flutter-apk/**/*.apk
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
 
       - name: Build Windows
         run: |
           dart pub global activate fastforge
           fastforge package --platform windows --targets zip
 
-      - name: Upload Artifacts
+      - name: List Windows Outputs
+        if: always()
+        run: |
+          Get-ChildItem -Recurse -Force dist -ErrorAction SilentlyContinue
+
+      - name: Upload Windows Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
+          name: windows-dist
+          if-no-files-found: error
           path: |
-            build/app/outputs/flutter-apk/*.apk
-            dist/*.zip
+            dist/**/*.zip
 
