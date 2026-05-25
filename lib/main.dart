@@ -9,7 +9,7 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isWindows) {
+  if (Platform.isWindows || Platform.isMacOS) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = WindowOptions(
       center: true,

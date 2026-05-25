@@ -9,3 +9,7 @@ releases:
           build_args:
             dart-define:
               APP_ENV: dev
+      - name: release-macos
+        package:
+          platform: macos
+          target: zip

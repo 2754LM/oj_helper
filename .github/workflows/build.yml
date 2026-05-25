@@ -92,3 +92,34 @@ jobs:
         with:
           name: dist
           path: dist/
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.2"
+          channel: "stable"
+          cache: true
+
+      - name: Install dependencies
+        run: |
+          flutter clean
+          flutter pub get
+
+      - name: Install Fastforge
+        run: dart pub global activate fastforge
+
+      - name: Build macOS .zip
+        run: |
+          export PATH="$PATH":"$HOME/.pub-cache/bin"
+          fastforge package --platform macos --targets zip
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dist
+          path: dist/**/*.zip
