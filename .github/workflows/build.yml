@@ -38,9 +38,9 @@ jobs:
       - name: Install Fastforge
         run: dart pub global activate fastforge
 
-      # 设置MSVC环境（Windows构建需要）
-      - name: Setup MSVC
-        uses: ilammy/msvc-dev-cmd@v1
+      # 设置MSBuild环境（Windows构建需要）
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
