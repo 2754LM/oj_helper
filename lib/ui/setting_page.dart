@@ -27,6 +27,11 @@ class _SettingPageState extends State<SettingPage> {
     });
   }
 
+  String _normalizeVersion(String version) {
+    // 移除 'v' 或 'V' 前缀，并移除所有点号
+    return version.replaceFirst(RegExp(r'^[vV]'), '').replaceAll('.', '');
+  }
+
   Future<void> checkForUpdate() async {
     setState(() {
       isChecking = true;
@@ -40,7 +45,10 @@ class _SettingPageState extends State<SettingPage> {
         String latestVersion = latestRelease['tag_name'];
         String releaseBody = latestRelease['body'];
 
-        if (latestVersion != curVersion) {
+        String normalizedLatest = _normalizeVersion(latestVersion);
+        String normalizedCurrent = _normalizeVersion(curVersion);
+
+        if (normalizedLatest != normalizedCurrent) {
           _showUpdateDialog(curVersion, latestVersion, releaseBody);
         } else {
           _showNoUpdateDialog();

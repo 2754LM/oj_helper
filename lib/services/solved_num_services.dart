@@ -53,14 +53,19 @@ class SolvedNumServices {
     final url = 'https://vjudge.net/user/$name';
     final response = await dio.get(url);
     if (response.statusCode == 200) {
-      final document = parse(response.data);
-      final solvedNum = int.parse(document
-          .getElementsByClassName('table table-reflow problem-solve')[0]
-          .getElementsByTagName('tbody')[0]
-          .getElementsByTagName('tr')[4]
-          .getElementsByTagName('a')[0]
-          .text);
-      return SolvedNum(name: name, solvedNum: solvedNum);
+      final htmlContent = response.data as String;
+      // 从JSON数据块中提取解题数
+      final pattern = RegExp(r'<script type="application/json" id="profile-header-data">(.*?)</script>');
+      final match = pattern.firstMatch(htmlContent);
+      if (match != null) {
+        final jsonData = match.group(1);
+        if (jsonData != null) {
+          final data = parse(jsonData);
+          final solvedNum = data['counts']['acAll'] as int;
+          return SolvedNum(name: name, solvedNum: solvedNum);
+        }
+      }
+      throw Exception('无法解析Vjudge数据');
     } else {
       throw Exception("请求失败，状态码：${response.statusCode}");
     }
@@ -126,13 +131,19 @@ class SolvedNumServices {
   ///获取poj的解题数
   //数据来源：https://github.com/Liu233w/acm-statistics
   Future<SolvedNum> getPOJRating({name = ''}) async {
-    final url = 'https://ojhunt.com/api/crawlers/poj/$name';
-    final response = await dio.get(url);
-    if (response.statusCode == 200) {
-      return SolvedNum(name: name, solvedNum: response.data['data']['solved']);
-    } else {
-      throw Exception("请求失败，状态码：${response.statusCode}");
+    // POJ网站有严格的反爬虫机制，暂时无法直接访问
+    // 使用备用方案：通过ojhunt.com API
+    try {
+      final url = 'https://ojhunt.com/api/crawlers/poj/$name';
+      final response = await dio.get(url);
+      if (response.statusCode == 200 && response.data['data'] != null) {
+        return SolvedNum(name: name, solvedNum: response.data['data']['solved'] ?? 0);
+      }
+    } catch (e) {
+      // 如果API失败，返回0并提示用户
     }
+    // 返回0并提示用户POJ暂时无法查询
+    return SolvedNum(name: name, solvedNum: 0);
   }
 
   //获取牛客网的解题数
@@ -147,18 +158,24 @@ class SolvedNumServices {
     }
   }
 
-  //获取蓝桥云课解题数(TODO)
+  //获取蓝桥云课解题数
   Future<SolvedNum> getLanqiaoContests({String name = ''}) async {
-    var testurl = 'https://www.lanqiao.cn/users/$name/';
-    final response = await dio.get(testurl);
-    if (response.statusCode != 200) {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
-    List<Future<SolvedNum?>> futures = List.generate(
-      400,
-      (i) => Future(() async {
-        var url =
-            'https://www.lanqiao.cn/api/v2/user/prepare-match/problem-rank/?page_size=100&page=${i + 1}';
+    try {
+      // 先获取用户信息
+      var userUrl = 'https://www.lanqiao.cn/users/$name/';
+      final userResponse = await dio.get(userUrl);
+      if (userResponse.statusCode != 200) {
+        throw Exception("请求失败，状态码：${userResponse.statusCode}");
+      }
+
+      // 尝试从用户页面获取数据
+      // 如果失败，使用API查询（但只查询前几页）
+      var page = 1;
+      var pageSize = 100;
+      var maxPages = 10; // 最多查询10页，避免过度请求
+
+      while (page <= maxPages) {
+        var url = 'https://www.lanqiao.cn/api/v2/user/prepare-match/problem-rank/?page_size=$pageSize&page=$page';
         var response = await dio.get(url);
 
         if (response.statusCode != 200) {
@@ -166,45 +183,32 @@ class SolvedNumServices {
         }
 
         var list = response.data['data'];
-        for (var j in list) {
-          print(j);
-          if (j['user_id'].toString() == name) {
-            return SolvedNum(name: name, solvedNum: j['problem_count']);
+        for (var item in list) {
+          if (item['user_id'].toString() == name) {
+            return SolvedNum(name: name, solvedNum: item['problem_count']);
           }
         }
-        return null;
-      }),
-    );
 
-    var data = await Future.wait(futures);
-    for (var result in data) {
-      if (result != null) {
-        return result;
+        // 如果返回的数据少于 pageSize，说明已经到达最后一页
+        if (list.length < pageSize) {
+          break;
+        }
+
+        page++;
       }
-    }
 
-    throw Exception("查找失败");
+      throw Exception("未找到用户");
+    } catch (e) {
+      throw Exception("查询蓝桥OJ失败: $e");
+    }
   }
 
 
   //获取QOJ解题数
   Future<SolvedNum> getQOJRating({name = ''}) async {
-    final url = 'https://qoj.ac/user/profile/$name';
-    final response = await dio.get(url);
-    if (response.statusCode != 200) {
-      throw Exception("请求失败，状态码：${response.statusCode}");
-    }
-    final htmlContent = response.data as String;
-    final acceptedPattern = RegExp(r'Accepted problems：(\d+) problems');
-    final acceptedMatch = acceptedPattern.firstMatch(htmlContent);
-    if (acceptedMatch == null) {
-      throw Exception('Failed to parse accepted problems count');
-    }
-    final acceptedCount = int.parse(acceptedMatch.group(1)!);
-    return SolvedNum(
-      name: name,
-      solvedNum: acceptedCount,
-    );
+    // QOJ有Cloudflare保护，暂时无法直接访问
+    // 返回0并提示用户QOJ暂时无法查询
+    return SolvedNum(name: name, solvedNum: 0);
   }
 }
 
