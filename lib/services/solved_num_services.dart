@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:oj_helper/models/solved_num.dart' show SolvedNum;
@@ -60,7 +61,7 @@ class SolvedNumServices {
       if (match != null) {
         final jsonData = match.group(1);
         if (jsonData != null) {
-          final data = parse(jsonData);
+          final data = json.decode(jsonData);
           final solvedNum = data['counts']['acAll'] as int;
           return SolvedNum(name: name, solvedNum: solvedNum);
         }
