@@ -95,7 +95,8 @@ jobs:
       # 第七步：Windows构建
       - name: Build Windows
         run: |
-          fastforge package --platform windows --targets zip
+          flutter config --enable-windows-desktop
+          flutter build windows --release
 
       - name: Upload Dist
         uses: actions/upload-artifact@v4
