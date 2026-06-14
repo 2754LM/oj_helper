@@ -220,10 +220,12 @@ class SolvedNumServices {
 
         final htmlContent = response.data as String;
         // 解析HTML查找用户
-        final userPattern = RegExp('data-nickname="$name"');
+        // 用户名在href中：//qoj.ac/user/profile/Qingyu
+        final userPattern = RegExp('href="[^"]*/user/profile/$name"');
         if (userPattern.hasMatch(htmlContent)) {
           // 找到用户，提取Accepted数量
-          final acceptedPattern = RegExp('data-nickname="$name".*?Accepted:\\s*:\\s*(\\d+)', dotAll: true);
+          // 格式：<strong>Accepted: : 14778</strong>
+          final acceptedPattern = RegExp('href="[^"]*/user/profile/$name".*?<strong>Accepted:\\s*:\\s*(\\d+)</strong>', dotAll: true);
           final match = acceptedPattern.firstMatch(htmlContent);
           if (match != null) {
             final acceptedCount = int.parse(match.group(1)!);
