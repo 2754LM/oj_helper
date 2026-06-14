@@ -26,6 +26,8 @@ class SolvedUtils {
         return await rs.getLanqiaoContests(name: name);
       case 'QOJ':
         return await rs.getQOJRating(name: name);
+      case '码题集':
+        return await rs.getMatijiRating(name: name);
       default:
         throw Exception('Platform not supported');
     }

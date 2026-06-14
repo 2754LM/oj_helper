@@ -205,11 +205,95 @@ class SolvedNumServices {
   }
 
 
-  //获取QOJ解题数
+  //获取QOJ解题数（通过遍历排行榜，加载较慢）
   Future<SolvedNum> getQOJRating({name = ''}) async {
-    // QOJ有Cloudflare保护，暂时无法直接访问
-    // 返回0并提示用户QOJ暂时无法查询
-    return SolvedNum(name: name, solvedNum: 0);
+    try {
+      var page = 1;
+      var pageSize = 50; // 每页50个用户
+      var maxPages = 20; // 最多查询20页
+
+      while (page <= maxPages) {
+        final url = 'https://qoj.ac/ranklist?type=ac_num&page=$page';
+        final response = await dio.get(url);
+
+        if (response.statusCode != 200) {
+          throw Exception("请求失败，状态码：${response.statusCode}");
+        }
+
+        final htmlContent = response.data as String;
+        // 解析HTML查找用户
+        final userPattern = RegExp('data-nickname="$name"');
+        if (userPattern.hasMatch(htmlContent)) {
+          // 找到用户，提取Accepted数量
+          final acceptedPattern = RegExp('data-nickname="$name".*?Accepted:\\s*:\\s*(\\d+)', dotAll: true);
+          final match = acceptedPattern.firstMatch(htmlContent);
+          if (match != null) {
+            final acceptedCount = int.parse(match.group(1)!);
+            return SolvedNum(name: name, solvedNum: acceptedCount);
+          }
+        }
+
+        // 检查是否还有更多页面
+        if (!htmlContent.contains('class="page-link"') || 
+            !htmlContent.contains('aria-label="Next"')) {
+          break;
+        }
+        page++;
+      }
+
+      throw Exception("未找到用户");
+    } catch (e) {
+      throw Exception("查询QOJ失败: $e");
+    }
+  }
+
+  //获取码题集解题数（通过遍历排行榜，加载较慢）
+  Future<SolvedNum> getMatijiRating({name = ''}) async {
+    try {
+      var start = 0;
+      var limit = 25; // 每页25个用户
+      var maxPages = 20; // 最多查询20页
+
+      for (var page = 0; page < maxPages; page++) {
+        final url = 'https://www.matiji.net/exam-back/pc/ojRankByType.do';
+        final response = await dio.post(
+          url,
+          data: 'rankType=0&start=$start&limit=$limit',
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          ),
+        );
+
+        if (response.statusCode == 200) {
+          final data = response.data;
+          if (data['error_no'] == '0') {
+            final datas = data['data']['datas'] as List;
+            for (var item in datas) {
+              if (item['nickname'] == name) {
+                return SolvedNum(name: name, solvedNum: item['passNum']);
+              }
+            }
+
+            // 检查是否还有更多数据
+            final total = data['data']['total'] as int;
+            if (start + limit >= total) {
+              break;
+            }
+          } else {
+            throw Exception("API错误: ${data['data']}");
+          }
+        } else {
+          throw Exception("请求失败，状态码：${response.statusCode}");
+        }
+        start += limit;
+      }
+
+      throw Exception("未找到用户");
+    } catch (e) {
+      throw Exception("查询码题集失败: $e");
+    }
   }
 }
 

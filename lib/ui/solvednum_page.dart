@@ -20,6 +20,8 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     '牛客',
     'VJudge',
     'hdu',
+    'QOJ',
+    '码题集',
   ];
   // 平台颜色
   Map<String, Color> _platforColor = {
@@ -30,6 +32,8 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'VJudge': const Color.fromARGB(255, 255, 165, 0), // 橘黄色
     'hdu': const Color.fromARGB(255, 150, 150, 150), // 中灰色
     '牛客': const Color.fromARGB(255, 255, 102, 0), // 橙色
+    'QOJ': const Color.fromARGB(255, 255, 20, 147), // 深粉色
+    '码题集': const Color.fromARGB(255, 0, 191, 255), // 天蓝色
   };
   // 平台简称
   Map<String, String> shortNmae = {
@@ -40,6 +44,8 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     'VJudge': 'VJ',
     'hdu': 'HDU',
     '牛客': '牛客',
+    'QOJ': 'QOJ',
+    '码题集': '码题',
   };
   Map<String, bool> _isLoading = {}; //存储每个平台是否正在查询
   Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
