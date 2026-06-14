@@ -209,10 +209,8 @@ class SolvedNumServices {
   Future<SolvedNum> getQOJRating({name = ''}) async {
     try {
       var page = 1;
-      var pageSize = 50; // 每页50个用户
-      var maxPages = 20; // 最多查询20页
 
-      while (page <= maxPages) {
+      while (true) {
         final url = 'https://qoj.ac/ranklist?type=ac_num&page=$page';
         final response = await dio.get(url);
 
@@ -233,9 +231,8 @@ class SolvedNumServices {
           }
         }
 
-        // 检查是否还有更多页面
-        if (!htmlContent.contains('class="page-link"') || 
-            !htmlContent.contains('aria-label="Next"')) {
+        // 检查是否还有更多页面（没有下一页按钮则停止）
+        if (!htmlContent.contains('aria-label="Next"')) {
           break;
         }
         page++;
@@ -251,10 +248,9 @@ class SolvedNumServices {
   Future<SolvedNum> getMatijiRating({name = ''}) async {
     try {
       var start = 0;
-      var limit = 25; // 每页25个用户
-      var maxPages = 20; // 最多查询20页
+      var limit = 25;
 
-      for (var page = 0; page < maxPages; page++) {
+      while (true) {
         final url = 'https://www.matiji.net/exam-back/pc/ojRankByType.do';
         final response = await dio.post(
           url,
