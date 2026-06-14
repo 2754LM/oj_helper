@@ -20,9 +20,6 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     '牛客',
     'VJudge',
     'hdu',
-    'poj',
-    '蓝桥云课',
-    'QOJ'
   ];
   // 平台颜色
   Map<String, Color> _platforColor = {
@@ -32,10 +29,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     '洛谷': const Color.fromARGB(255, 50, 205, 50), // 深绿色
     'VJudge': const Color.fromARGB(255, 255, 165, 0), // 橘黄色
     'hdu': const Color.fromARGB(255, 150, 150, 150), // 中灰色
-    'poj': const Color.fromARGB(255, 200, 200, 200), // 浅灰色
     '牛客': const Color.fromARGB(255, 255, 102, 0), // 橙色
-    '蓝桥云课': const Color.fromARGB(255, 255, 215, 0), //金黄色
-    'QOJ': const Color.fromARGB(255, 255, 20, 147), // 深粉色
   };
   // 平台简称
   Map<String, String> shortNmae = {
@@ -45,10 +39,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
     '洛谷': '洛谷',
     'VJudge': 'VJ',
     'hdu': 'HDU',
-    'poj': 'POJ',
     '牛客': '牛客',
-    '蓝桥云课': '蓝桥',
-    'QOJ': 'QOJ'
   };
   Map<String, bool> _isLoading = {}; //存储每个平台是否正在查询
   Map<String, String?> _infoMessages = {}; // 存储每个平台的查询信息
@@ -274,13 +265,6 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                       await getLeetcodePlatformHelp(context);
                     },
                     icon: const Icon(Icons.help),
-                  ),
-                if (platformName == '蓝桥云课')
-                  IconButton(
-                    onPressed: () async {
-                      await getLanqiaoPlatformHelp(context);
-                    },
-                    icon: const Icon(Icons.error),
                   )
                 else
                   Container(),
@@ -305,7 +289,7 @@ class _SolvedNumPageState extends State<SolvedNumPage> {
                   controller: _usernameControllers[platformName],
                   enabled: _isLoading[platformName] == false,
                   decoration: InputDecoration(
-                    labelText: (platformName == '牛客' || platformName == '蓝桥云课')
+                    labelText: platformName == '牛客'
                         ? 'id'
                         : '用户名',
                     hintText: '多用户用;分隔',
