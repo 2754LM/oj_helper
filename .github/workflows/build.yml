@@ -89,8 +89,16 @@ jobs:
       # 第七步：Windows构建
       - name: Build Windows
         run: |
-          flutter config --enable-windows-desktop
-          flutter build windows --release
+          fastforge package --platform windows --targets zip
+
+      # 第八步：复制Windows文件到dist
+      - name: Copy Windows Files
+        run: |
+          if (!(Test-Path "dist/windows")) {
+            New-Item -ItemType Directory -Path "dist/windows" -Force
+          }
+          Copy-Item -Path "dist/*.zip" -Destination "dist/windows/" -Force -ErrorAction SilentlyContinue
+          Write-Output "Windows文件已复制到 dist/windows/"
 
       - name: Upload Dist
         uses: actions/upload-artifact@v4
